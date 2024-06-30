@@ -13,6 +13,8 @@ namespace BloodDonationApp.Presentation.Controllers
 {
     public class ApiBaseController : ControllerBase
     {
+
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ActionResult ProcessError(ApiBaseResponse baseResponse)
         {
             return baseResponse switch
@@ -41,6 +43,11 @@ namespace BloodDonationApp.Presentation.Controllers
                 {
                     Message = ((ApiUnavailableForLegalReasonsResponse)baseResponse).ErrorMessage,
                     StatusCode = StatusCodes.Status451UnavailableForLegalReasons
+                }),
+                ApiUnprocessableEntityResponse => StatusCode(StatusCodes.Status422UnprocessableEntity, new ExceptionMessage
+                {
+                    Message = ((ApiUnprocessableEntityResponse)baseResponse).ErrorMessage,
+                    StatusCode = StatusCodes.Status422UnprocessableEntity
                 }),
                 _ => throw new NotImplementedException()
             };

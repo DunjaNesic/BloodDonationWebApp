@@ -1,6 +1,8 @@
 ﻿using BloodDonationApp.DataAccessLayer.BaseRepository;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Infrastructure;
+using Common.RequestFeatures;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,37 +12,33 @@ using System.Threading.Tasks;
 
 namespace BloodDonationApp.DataAccessLayer.QuestionnaireRepo
 {
-    public class QuestionnaireRepository : IQuestionnaireRepository
+    public class QuestionnaireRepository : RepositoryBase<Questionnaire>, IQuestionnaireRepository
     {
         private readonly BloodDonationContext _context;
-        public QuestionnaireRepository(BloodDonationContext context)
-        {
+        public QuestionnaireRepository(BloodDonationContext context) : base(context) {
             _context = context;
         }
-
-        public Task CreateAsync(Questionnaire t)
+        public async Task CreateQuestionnaireForDonor(string JMBG, Questionnaire questionnaire)
         {
-            throw new NotImplementedException();
+            questionnaire.JMBG = JMBG;
+            await _context.Questionnaires.AddAsync(questionnaire);
         }
 
-        public Task DeleteAsync(Questionnaire t)
+        public async Task<IEnumerable<Questionnaire>> GetAllForDonorAsync(string JMBG, QuestionnaireParameters questionnaireParameters, bool trackChanges)
         {
-            throw new NotImplementedException();
-        }
+            var includes = new Expression<Func<Questionnaire, object>>[]
+            {
+                  q => q.ListOfQuestions,
+                  q => q.Donor
+            };
 
-        public Task<IQueryable<Questionnaire>> GetAllAsync(bool trackChanges)
-        {
-            throw new NotImplementedException();
-        }
+            var query = GetByCondition(q => q.JMBG.Equals(JMBG), trackChanges, includes);
+            query = query.OrderBy(o => o.DateOfMaking)
+                .Skip((questionnaireParameters.PageNumber-1)*questionnaireParameters.PageSize)
+                .Take(questionnaireParameters.PageSize);
 
-        public Task<IQueryable<Questionnaire>> GetByConditionAsync(Expression<Func<Questionnaire, bool>> condition, bool trackChanges)
-        {
-            throw new NotImplementedException();
+            return await query.ToListAsync();
         }
-
-        public Task UpdateAsync(Questionnaire t)
-        {
-            throw new NotImplementedException();
-        }
+  
     }
 }

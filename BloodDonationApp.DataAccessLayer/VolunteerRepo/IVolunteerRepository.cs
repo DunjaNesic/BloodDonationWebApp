@@ -12,5 +12,9 @@ namespace BloodDonationApp.DataAccessLayer.VolunteerRepo
     public interface IVolunteerRepository : IRepository<Volunteer>
     {
         Task<Volunteer?> GetVolunteer(Expression<Func<Volunteer, bool>> condition, bool trackChanges);
+        IQueryable<Volunteer> GetAllVolunteers(bool trackChanges);
+        IQueryable<Volunteer> GetVolunteersByCondition(Expression<Func<Volunteer, bool>> condition, bool trackChanges);
+        Task<IEnumerable<TransfusionAction>> GetActions(int volunteerID);
+        Task<IEnumerable<TransfusionAction>> GetIncomingAction(int volunteerID);
     }
 }

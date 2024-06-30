@@ -12,6 +12,8 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
     public interface IDonorService
     {
         Task<ApiBaseResponse> GetAll(bool trackChanges);
-        Task<ApiBaseResponse> GetByCondition(Expression<Func<Donor, bool>> condition, bool trackChanges);
+        Task<ApiBaseResponse> GetByCondition(string JMBG);
+        Task<ApiBaseResponse> GetDonorsActions(string jMBG);
+        Task<ApiBaseResponse> GetIncomingDonorAction(string jMBG);
     }
 }

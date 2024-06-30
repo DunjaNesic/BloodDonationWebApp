@@ -11,7 +11,7 @@ namespace BloodDonationApp.Domain.DomainModel
     {
         [Key]
         public int PlaceID { get; set; }
-        public string PlaceName { get; set; } = string.Empty;
+        public required string PlaceName { get; set; }
         public override string ToString()
         {
             return PlaceName;

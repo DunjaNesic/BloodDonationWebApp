@@ -11,11 +11,7 @@ namespace BloodDonationApp.Domain.DomainModel
     {
         [Key]
         public int QuestionID { get; set; }
-        public Questionnaire? Questionnaire { get; set; }
-        public string JMBG { get; set; } = string.Empty;
-        public int ActionID { get; set; }
-        public int QuestionnaireID { get; set; }
         public string? QuestionText { get; set; }
-        public bool Answer { get; set; }
+        public int Flag { get; set; }
     }
 }

@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BloodDonationApp.DataTransferObject.Questionnaire
+namespace BloodDonationApp.DataTransferObject.Questionnaires
 {
+    [Serializable]
     public class GetQuestionnaireDTO
     {
-        public string QuestionnaireTitle { get; set; } = string.Empty;
+        public string? QuestionnaireTitle { get; set; }
         public string? Remark { get; set; }
-        public List<Question> ListOfQuestions { get; set; } = new List<Question>();
+        //public List<QuestionnaireQuestion> ListOfQuestions { get; set; } = new List<QuestionnaireQuestion>();
+
     }
 }

@@ -1,5 +1,9 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
 using BloodDonationApp.DataAccessLayer.UnitOfWork;
+using BloodDonationApp.DataTransferObject.Donors;
+using BloodDonationApp.DataTransferObject.Mappers;
+using BloodDonationApp.Domain.DomainModel;
+using BloodDonationApp.LoggerService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,14 +21,14 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         private readonly Lazy<IQuestionService> _questionService;
         private readonly Lazy<IVolunteerService> _volunteerService;
 
-        public ServiceManager(IUnitOfWork uow)
+        public ServiceManager(IUnitOfWork uow, ILoggerManager _logger)
         {
-            _actionService = new Lazy<IActionService>(() => new ActionService(uow));
-            _donorService = new Lazy<IDonorService>(() => new DonorService(uow));
+            _actionService = new Lazy<IActionService>(() => new ActionService(uow, _logger));
+            _donorService = new Lazy<IDonorService>(() => new DonorService(uow, _logger));
             _placeService = new Lazy<IPlaceService>(() => new PlaceService(uow));
-            _questionnaireService = new Lazy<IQuestionnaireService>(() => new QuestionnaireService(uow));
+            _questionnaireService = new Lazy<IQuestionnaireService>(() => new QuestionnaireService(uow, _logger));
             _questionService = new Lazy<IQuestionService>(() => new QuestionService(uow));
-            _volunteerService = new Lazy<IVolunteerService>(() => new VolunteerService(uow));
+            _volunteerService = new Lazy<IVolunteerService>(() => new VolunteerService(uow, _logger));
         }
 
         public IActionService ActionService => _actionService.Value;

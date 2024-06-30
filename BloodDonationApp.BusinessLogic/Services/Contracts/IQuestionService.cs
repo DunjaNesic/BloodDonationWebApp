@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BloodDonationApp.Domain.DomainModel;
+using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
 {
     public interface IQuestionService
     {
+        Task<IQueryable<Question>> GetAll(bool trackChanges);
     }
 }

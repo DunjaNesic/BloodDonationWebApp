@@ -19,27 +19,23 @@ namespace BloodDonationApp.Domain.DomainModel
         OPozitivna,
         ONegativna
     }
-    public enum IsActive
-    {
-        Ne = 0,
-        Da = 1
-    }
     public class Donor
     {
         [Key]
-        public string JMBG { get; set; } = string.Empty;
-        public string DonorFullName { get; set; } = string.Empty;
-        public string DonorEmailAddress { get; set; } = string.Empty;
+        public required string JMBG { get; set; }
+        public required string Password { get; set; }
+        public required string DonorFullName { get; set; }
+        public required string DonorEmailAddress { get; set; }
         public BloodType BloodType { get; set; }
-        public IsActive IsActive { get; set; }
+        public bool IsActive { get; set; }
         public DateTime LastDonationDate { get; set; }
         public int PlaceID { get; set; }
-        public Place? Place { get; set; }
+        public Place Place { get; set; } = null!;
 
         [JsonIgnore]
-        public List<TransfusionAction>? ListOfActions { get; set; }
-        public List<Questionnaire>? ListOfQuestionnaires { get; set; }
-        public byte[] RowVersion { get; set; } = new byte[0];
+        public List<TransfusionAction> ListOfActions { get; set; } = new List<TransfusionAction> { };
+        public List<CallToDonate> CallsToDonate { get; set; } = new List<CallToDonate> { };
+        public List<Questionnaire> ListOfQuestionnaires { get; set; } = new List<Questionnaire> { };
         public override string ToString()
         {
             return DonorFullName;

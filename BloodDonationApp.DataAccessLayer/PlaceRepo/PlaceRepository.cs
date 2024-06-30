@@ -23,22 +23,22 @@ namespace BloodDonationApp.DataAccessLayer.PlaceRepo
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(Place t)
+        public void Delete(Place t)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IQueryable<Place>> GetAllAsync(bool trackChanges)
+        public IQueryable<Place> GetAll(bool trackChanges, params Expression<Func<Place, object>>[] includes)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IQueryable<Place>> GetByConditionAsync(Expression<Func<Place, bool>> condition, bool trackChanges)
+        public IQueryable<Place> GetByCondition(Expression<Func<Place, bool>> condition, bool trackChanges, params Expression<Func<Place, object>>[] includes)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdateAsync(Place t)
+        public void Update(Place t)
         {
             throw new NotImplementedException();
         }

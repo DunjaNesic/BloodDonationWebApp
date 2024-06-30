@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BloodDonationApp.Domain.DomainModel
 {
     public class Questionnaire
     {
-        public int QuestionnaireID { get; set; }
-        public string JMBG { get; set; } = string.Empty;
-        public Donor? Donor { get; set; }
+        public required string JMBG { get; set; }
+        public Donor Donor { get; set; } = null!;
         public int ActionID { get; set; }
-        public TransfusionAction? TransfusionAction { get; set; }
-        public string QuestionnaireTitle { get; set; } = string.Empty;
+        public TransfusionAction Action { get; set; } = null!;
+        public string? QuestionnaireTitle { get; set; }
+        public bool Approved { get; set; }
         public string? Remark { get; set; }
-        public List<Question> ListOfQuestions { get; set; } = new List<Question>();
+        public DateTime DateOfMaking { get; set; }
+        public List<Question> Questions { get; set; } = new List<Question>();
+        public List<QuestionnaireQuestion> ListOfQuestions { get; set; } = new List<QuestionnaireQuestion>();
+        public string? QRCode { get; set; }
+        public byte[] RowVersion { get; set; } = Array.Empty<byte>();
     }
 }

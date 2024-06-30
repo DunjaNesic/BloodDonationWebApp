@@ -12,6 +12,7 @@
 	  <ProjectReference Include="..\BloodDonationApp.BusinessLogic\BloodDonationApp.BusinessLogic.csproj" />
 	  <ProjectReference Include="..\BloodDonationApp.DataTransferObject\BloodDonationApp.DataTransferObject.csproj" />
 	  <ProjectReference Include="..\BloodDonationApp.Logging\BloodDonationApp.LoggerService.csproj" />
+	  <ProjectReference Include="..\Common\Common.csproj" />
 	</ItemGroup>
 
 </Project>

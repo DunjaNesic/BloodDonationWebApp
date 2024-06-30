@@ -1,73 +1,108 @@
-﻿using BloodDonationApp.Domain.DomainModel;
+﻿using BloodDonationApp.DataAccessLayer.BaseRepository;
+using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
 using System.Linq.Expressions;
 
 
 namespace BloodDonationApp.DataAccessLayer.VolunteerRepo
 {
-    public class VolunteerRepository : IVolunteerRepository
+    public class VolunteerRepository : RepositoryBase<Volunteer>, IVolunteerRepository
     {
         private readonly BloodDonationContext _context;
-        public VolunteerRepository(BloodDonationContext context)
+        public VolunteerRepository(BloodDonationContext context) : base(context)
         {
             _context = context;
         }
 
-        public async Task CreateAsync(Volunteer v)
+        public IQueryable<Volunteer> GetAllVolunteers(bool trackChanges)
         {
-            await _context.Volunteers.AddAsync(v);
+            var includes = new Expression<Func<Volunteer, object>>[]
+          {
+                 v => v.RedCross,
+                 v => v.ListOfActions
+          };
+            var query = GetAll(trackChanges, includes);
+            return query;
         }
 
-        public Task DeleteAsync(Volunteer v)
+        public IQueryable<Volunteer> GetVolunteersByCondition(Expression<Func<Volunteer, bool>> condition, bool trackChanges)
         {
-            _context.Volunteers.Remove(v);      
-            return Task.CompletedTask;
-        }
+            var includes = new Expression<Func<Volunteer, object>>[]
+             {
+                 v => v.RedCross,
+                 v => v.ListOfActions
+             };
 
-        public async Task<IQueryable<Volunteer>> GetAllAsync(bool trackChanges)
-        {            
-            IQueryable<Volunteer> query = _context.Volunteers
-            .Include(v => v.Place)
-            .Include(v => v.ListOfActions);
-
-            query = trackChanges ? query : query.AsNoTracking();
-
-            return await Task.FromResult(query);
-        }
-
-        public async Task<IQueryable<Volunteer>> GetByConditionAsync(Expression<Func<Volunteer, bool>> condition, bool trackChanges)
-        {
-            var query = _context.Volunteers
-            .Include(v => v.Place)
-            .Where(condition)
-            .AsQueryable();
-
-            query = trackChanges ? query : query.AsNoTracking();
-
-            return await Task.FromResult(query);
+            var query = GetByCondition(condition, trackChanges, includes);
+   
+            return query;
         }
 
         public async Task<Volunteer?> GetVolunteer(Expression<Func<Volunteer, bool>> condition, bool trackChanges)
         {
-            var query = _context.Volunteers
-            .Where(condition)
-            .AsQueryable();
+            var includes = new Expression<Func<Volunteer, object>>[]
+             {
+                 v => v.RedCross
+             };
 
-            query = trackChanges ? query : query.AsNoTracking();
+            var query = GetByCondition(condition, trackChanges, includes);
 
             var volunteer = await query.FirstOrDefaultAsync();
             return volunteer;
         }
 
-        public Task UpdateAsync(Volunteer v)
+        public async Task<IEnumerable<TransfusionAction>> GetActions(int volunteerID)
         {
-            //nesto ovde ne radim lepo
-            _context.Entry(v).State = EntityState.Modified;
-            _context.Volunteers.Update(v);
-            return Task.CompletedTask;
+            var volunteer = await _context.Volunteers
+               .Include(d => d.CallsToVolunteer)
+               .FirstOrDefaultAsync(d => d.VolunteerID == volunteerID);
+
+            if (volunteer == null || volunteer.CallsToVolunteer == null || !volunteer.CallsToVolunteer.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
+
+            var actionIds = volunteer.CallsToVolunteer.Select(ctv => ctv.ActionID).ToList();
+
+            if (actionIds == null || !actionIds.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
+
+            var actions = await _context.TransfusionActions
+                .Where(a => actionIds.Contains(a.ActionID))
+                .ToListAsync();
+
+            return actions;
         }
 
-   
+        public async Task<IEnumerable<TransfusionAction>> GetIncomingAction(int volunteerID)
+        {
+            var volunteer = await _context.Volunteers
+               .Include(d => d.CallsToVolunteer)
+               .FirstOrDefaultAsync(d => d.VolunteerID == volunteerID);
+
+            if (volunteer == null || volunteer.CallsToVolunteer == null || !volunteer.CallsToVolunteer.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
+
+            var calls = volunteer.CallsToVolunteer.Where(ctv => ctv.AcceptedTheCall == true);
+
+            var actionIds = calls.Select(ctv => ctv.ActionID).ToList();
+
+            if (actionIds == null || !actionIds.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
+
+            var actions = await _context.TransfusionActions
+                .Where(a => actionIds.Contains(a.ActionID) && a.ActionDate > DateTime.UtcNow)
+                .ToListAsync();
+
+            return actions;
+        }
     }
 }

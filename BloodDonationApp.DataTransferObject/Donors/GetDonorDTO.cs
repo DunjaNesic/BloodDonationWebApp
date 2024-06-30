@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using BloodDonationApp.Domain.DomainModel;
 
 
-namespace BloodDonationApp.DataTransferObject.Donor
+namespace BloodDonationApp.DataTransferObject.Donors
 {
+    [Serializable]
     public class GetDonorDTO
     {
         public string JMBG { get; set; } = string.Empty;
@@ -15,7 +16,10 @@ namespace BloodDonationApp.DataTransferObject.Donor
         public string DonorEmailAddress { get; set; } = string.Empty;
         public BloodType BloodType { get; set; }
         public string PlaceName { get; set; } = string.Empty;
-        public IsActive IsActive { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime LastDonationDate { get; set; }
+        public List<GetCallsToDonor>? CallsToDonate { get; set; }
+
 
     }
 }

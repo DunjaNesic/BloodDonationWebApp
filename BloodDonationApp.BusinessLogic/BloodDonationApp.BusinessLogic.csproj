@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BloodDonationApp.DataAccessLayer\BloodDonationApp.DataAccessLayer.csproj" />
+    <ProjectReference Include="..\BloodDonationApp.DataTransferObject\BloodDonationApp.DataTransferObject.csproj" />
     <ProjectReference Include="..\BloodDonationApp.Domain\BloodDonationApp.Domain.csproj" />
+    <ProjectReference Include="..\BloodDonationApp.Logging\BloodDonationApp.LoggerService.csproj" />
   </ItemGroup>
 
 </Project>

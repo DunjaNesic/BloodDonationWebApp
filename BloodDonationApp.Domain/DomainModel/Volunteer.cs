@@ -18,17 +18,19 @@ namespace BloodDonationApp.Domain.DomainModel
         [Key]
         public int VolunteerID { get; set; }
         public string VolunteerFullName { get; set; } = string.Empty;
+        public string VolunteerEmailAddress { get; set; } = string.Empty;
+        public required string Username { get; set; } 
+        public required string Password { get; set; } 
         public Sex Sex { get; set; }
         public DateTime DateFreeFrom { get; set; }
         public DateTime DateFreeTo { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public int PlaceID { get; set; }
-        public Place? Place { get; set; }
-        public string VolunteerEmailAddress { get; set; } = string.Empty;
-        public byte[] RowVersion { get; set; } = new byte[0];
+        public int RedCrossID { get; set; }
+        public RedCross RedCross { get; set; } = null!;
 
         [JsonIgnore]
-        public List<TransfusionAction>? ListOfActions { get; set; }
+        public List<TransfusionAction> ListOfActions { get; set; } = new List<TransfusionAction> { };
+        public List<CallToVolunteer> CallsToVolunteer { get; set; } = new List<CallToVolunteer> { };
         public override string ToString()
         {
             return VolunteerFullName;

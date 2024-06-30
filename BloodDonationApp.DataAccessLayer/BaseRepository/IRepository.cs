@@ -9,11 +9,11 @@ namespace BloodDonationApp.DataAccessLayer.BaseRepository
 {
     public interface IRepository<T> where T : class
     {
-        Task<IQueryable<T>> GetAllAsync(bool trackChanges);
-        Task<IQueryable<T>> GetByConditionAsync(Expression<Func<T, bool>> condition, bool trackChanges);
+        IQueryable<T> GetAll(bool trackChanges, params Expression<Func<T, object>>[] includes);
+        IQueryable<T> GetByCondition(Expression<Func<T, bool>> condition, bool trackChanges, params Expression<Func<T, object>>[] includes);
         Task CreateAsync(T t);
-        Task UpdateAsync(T t);
-        Task DeleteAsync(T t);
+        void Update(T t);
+        void Delete(T t);
 
     }
 }

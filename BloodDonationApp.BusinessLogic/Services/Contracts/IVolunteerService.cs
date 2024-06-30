@@ -13,8 +13,11 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
     {
         Task<ApiBaseResponse> GetAll(bool trackChanges);
         Task<ApiBaseResponse> GetByCondition(Expression<Func<Volunteer, bool>> condition, bool trackChanges);
-        Task Create(Volunteer v);
+        Task<ApiBaseResponse> GetVolunteer(int volunteerID);
+        Task<ApiBaseResponse> Create(Volunteer v);
         Task Update(Volunteer v, int volunteerID);
-        Task Delete(Volunteer v);
+        Task<ApiBaseResponse> Delete(int volunteerID);
+        Task<ApiBaseResponse> GetVolunteersActions(int volunteerID);
+        Task<ApiBaseResponse> GetIncomingVolunteerAction(int volunteerID);
     }
 }

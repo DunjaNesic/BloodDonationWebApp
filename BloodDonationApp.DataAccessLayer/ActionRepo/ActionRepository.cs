@@ -1,50 +1,49 @@
 ﻿using BloodDonationApp.DataAccessLayer.BaseRepository;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BloodDonationApp.DataAccessLayer.ActionRepo
 {
-    public class ActionRepository : IActionRepository
+    public class ActionRepository : RepositoryBase<TransfusionAction>, IActionRepository
     {
         private readonly BloodDonationContext _context;
-        public ActionRepository(BloodDonationContext context)
+        public ActionRepository(BloodDonationContext context) : base(context)
         {
             _context = context;
         }
-        public Task CreateAsync(TransfusionAction t)
+        public IQueryable<TransfusionAction> GetAllActions(bool trackChanges)
         {
-            throw new NotImplementedException();
+            var includes = new Expression<Func<TransfusionAction, object>>[]
+            {
+                 a => a.Place,
+                 //hmm da li da stavim u TransfusionAction da ne moze da bude null
+                 a => a.ListOfCallsToDonors,
+                 a => a.ListOfCallsToVolunteers
+            };
+
+            var query = GetAll(trackChanges, includes);
+
+            return query;
+        }
+        public async Task<TransfusionAction?> GetAction(int actionID)
+        {
+            var action = await _context.TransfusionActions.Where(a => a.ActionID == actionID).SingleOrDefaultAsync();
+
+            return action;
         }
 
-        public Task DeleteAsync(TransfusionAction t)
+        public IQueryable<TransfusionAction> GetActionsByCondition(Expression<Func<TransfusionAction, bool>> condition, bool trackChanges)
         {
-            throw new NotImplementedException();
-        }
+            var includes = new Expression<Func<TransfusionAction, object>>[]
+            {
+                a => a.Place
+            };
 
-        public Task<IQueryable<TransfusionAction>> GetAllAsync(bool trackChanges)
-        {
-            throw new NotImplementedException();
-        }
+            var query = GetByCondition(condition, trackChanges, includes);
 
-        public Task<IQueryable<TransfusionAction>> GetByConditionAsync(Expression<Func<TransfusionAction, bool>> condition, bool trackChanges)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateAsync(TransfusionAction t)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateAsync(TransfusionAction t, TransfusionAction tt)
-        {
-            throw new NotImplementedException();
+            return query;
         }
     }
 }

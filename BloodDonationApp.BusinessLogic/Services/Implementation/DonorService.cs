@@ -1,41 +1,69 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
 using BloodDonationApp.DataAccessLayer.UnitOfWork;
+using BloodDonationApp.DataTransferObject.Action;
+using BloodDonationApp.DataTransferObject.Donors;
+using BloodDonationApp.DataTransferObject.Mappers;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses;
+using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Action;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Donor;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using BloodDonationApp.LoggerService;
+using Microsoft.EntityFrameworkCore;
 
 namespace BloodDonationApp.BusinessLogic.Services.Implementation
 {
     public class DonorService : IDonorService
     {
         private readonly IUnitOfWork uow;
-        public DonorService(IUnitOfWork unitOfWork)
+        private readonly ILoggerManager _logger;
+        private readonly DonorMapper _mapper = new DonorMapper();
+        private readonly ActionMapper _actionMapper = new ActionMapper();
+        public DonorService(IUnitOfWork unitOfWork, ILoggerManager logger)
         {
-            uow = unitOfWork;
+            uow = unitOfWork;   
+            _logger = logger;
         }
-
         public async Task<ApiBaseResponse> GetAll(bool trackChanges)
         {
-            var donors = await uow.DonorRepository.GetAllAsync(trackChanges);
-            return new ApiOkResponse<IQueryable<Donor>>(donors);
+            _logger.LogInformation("GetAll from DonorService");
+            var query = uow.DonorRepository.GetAllDonors(trackChanges);
+            var donors = await query.ToListAsync();
+            var donorsDTO = donors.Select(donor => _mapper.ToDto(donor)).ToList();
+            return new ApiOkResponse<IEnumerable<GetDonorDTO>>(donorsDTO);
+        }
+        public async Task<ApiBaseResponse> GetByCondition(string JMBG)
+        {
+            var foundDonor = await uow.DonorRepository.GetByJMBG(JMBG);
+            if (foundDonor == null) return new DonorNotFoundResponse();
+            var foundDonorDTO = _mapper.ToDto(foundDonor);
+            if (foundDonorDTO == null) return new DonorNotFoundResponse();
+            return new ApiOkResponse<GetDonorDTO>(foundDonorDTO);
         }
 
-        public async Task<ApiBaseResponse> GetByCondition(Expression<Func<Donor, bool>> condition, bool trackChanges)
+        public async Task<ApiBaseResponse> GetDonorsActions(string jMBG)
         {
-            var allDonors = await uow.DonorRepository.GetAllAsync(trackChanges);
-            var foundDonor = allDonors.Where(condition);
-            if (foundDonor.IsNullOrEmpty()) return new DonorNotFoundResponse();
-            if (foundDonor.Count() > 1) return new DonorBadRequestResponse();
-            return new ApiOkResponse<IQueryable<Donor>>(foundDonor);
+            var actions = await uow.DonorRepository.GetActions(jMBG);
+
+            if (!actions.Any())
+            {
+                return new ActionNotFoundResponse();
+            }
+            var actionsDTO = actions.Select(a => _actionMapper.ToDto(a)).ToList();
+            return new ApiOkResponse<IEnumerable<GetTransfusionActionDTO>>(actionsDTO);
+        }
+
+        public async Task<ApiBaseResponse> GetIncomingDonorAction(string jMBG)
+        {
+            var actions = await uow.DonorRepository.GetIncomingAction(jMBG);
+
+            if (!actions.Any())
+            {
+                return new ActionNotFoundResponse();
+            }
+            var actionsDTO = actions.Select(a => _actionMapper.ToDto(a)).ToList();
+            return new ApiOkResponse<IEnumerable<GetTransfusionActionDTO>>(actionsDTO);
         }
     }
 }

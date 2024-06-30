@@ -1,6 +1,9 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
 using BloodDonationApp.BusinessLogic.Services.Implementation;
 using BloodDonationApp.DataAccessLayer.UnitOfWork;
+using BloodDonationApp.DataTransferObject.Donors; //proveri dal sme
+using BloodDonationApp.DataTransferObject.Mappers; //proveri dal sme
+using BloodDonationApp.Domain.DomainModel; //proveri dal sme
 using BloodDonationApp.Infrastructure;
 using BloodDonationApp.LoggerService;
 using Microsoft.EntityFrameworkCore;

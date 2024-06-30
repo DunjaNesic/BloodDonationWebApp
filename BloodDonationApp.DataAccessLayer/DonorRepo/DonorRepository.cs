@@ -11,47 +11,97 @@ using System.Threading.Tasks;
 
 namespace BloodDonationApp.DataAccessLayer.DonorRepo
 {
-    public class DonorRepository : IDonorRepository
+    public class DonorRepository : RepositoryBase<Donor>, IDonorRepository
     {
         private readonly BloodDonationContext _context;
-        public DonorRepository(BloodDonationContext context)
+        public DonorRepository(BloodDonationContext context) : base(context)
         {
             _context = context;
         }
-        public Task CreateAsync(Donor t)
+        public IQueryable<Donor> GetAllDonors(bool trackChanges)
         {
-            throw new NotImplementedException();
+            var includes = new Expression<Func<Donor, object>>[]
+          {
+                 d => d.Place,
+                 d => d.ListOfActions,
+                 d => d.ListOfQuestionnaires,
+                 d => d.CallsToDonate
+          };
+            var query = GetAll(trackChanges, includes);
+            return query;
+        }
+        public IQueryable<Donor> GetBySomeCondition(Expression<Func<Donor, bool>> condition, bool trackChanges)
+        {
+            var includes = new Expression<Func<Donor, object>>[]
+          {
+                 d => d.Place,
+                 d => d.ListOfActions,
+                 d => d.ListOfQuestionnaires,
+                 d => d.CallsToDonate
+          };
+
+            var query = GetByCondition(condition, trackChanges, includes);
+            return query;
+        }
+        public async Task<Donor?> GetByJMBG(string JMBG)
+        {
+            var donor = await _context.Donors
+                .Include(d => d.Place)
+                .Where(d => d.JMBG.ToLower().Equals(JMBG.ToLower())).SingleOrDefaultAsync();
+
+            return donor;
         }
 
-        public Task DeleteAsync(Donor t)
+        public async Task<IEnumerable<TransfusionAction>> GetActions(string jMBG)
         {
-            throw new NotImplementedException();
+            var donor = await _context.Donors
+                .Include(d => d.CallsToDonate)
+                .FirstOrDefaultAsync(d => d.JMBG == jMBG);
+
+            if (donor == null || donor.CallsToDonate == null || !donor.CallsToDonate.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
+
+            var actionIds = donor.CallsToDonate.Select(ctd => ctd.ActionID).ToList();
+
+            if (actionIds == null || !actionIds.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
+
+            var actions = await _context.TransfusionActions
+                .Where(a => actionIds.Contains(a.ActionID))
+                .ToListAsync();
+
+            return actions;
         }
 
-        public async Task<IQueryable<Donor>> GetAllAsync(bool trackChanges)
+        public async Task<IEnumerable<TransfusionAction>> GetIncomingAction(string jMBG)
         {
-            IQueryable<Donor> query = _context.Donors
-                .Include(d => d.Place);
+            var donor = await _context.Donors
+                .Include(d => d.CallsToDonate)
+                .FirstOrDefaultAsync(d => d.JMBG == jMBG);
 
-            query = trackChanges ? query : query.AsNoTracking();
+            if (donor == null || donor.CallsToDonate == null || !donor.CallsToDonate.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
 
-            return await Task.FromResult(query);
-        }
+            var calls = donor.CallsToDonate.Where(ctd => ctd.AcceptedTheCall == true);
 
-        public async Task<IQueryable<Donor>> GetByConditionAsync(Expression<Func<Donor, bool>> condition, bool trackChanges)
-        {
-            var query = _context.Donors
-           .Include(d => d.Place)
-           .Where(condition)
-           .AsQueryable();
+            var actionIds = calls.Select(ctd => ctd.ActionID).ToList();
 
-            query = trackChanges ? query : query.AsNoTracking();
+            if (actionIds == null || !actionIds.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
 
-            return await Task.FromResult(query);
-        }
-        public Task UpdateAsync(Donor t)
-        {
-            throw new NotImplementedException();
+            var actions = await _context.TransfusionActions
+                .Where(a => actionIds.Contains(a.ActionID) && a.ActionDate > DateTime.UtcNow )
+                .ToListAsync();
+
+            return actions;
         }
     }
 }

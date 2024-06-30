@@ -1,5 +1,8 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
 using BloodDonationApp.DataAccessLayer.UnitOfWork;
+using BloodDonationApp.Domain.DomainModel;
+using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
+using BloodDonationApp.Domain.ResponsesModel.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +17,11 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         public QuestionService(IUnitOfWork unitOfWork)
         {
             uow = unitOfWork;
+        }
+
+        public Task<IQueryable<Question>> GetAll(bool trackChanges)
+        {
+            throw new NotImplementedException();
         }
     }
 }
