@@ -26,6 +26,7 @@ namespace BloodDonationApp.Domain.DomainModel
         public required string Password { get; set; }
         public required string DonorFullName { get; set; }
         public required string DonorEmailAddress { get; set; }
+        public Sex Sex { get; set; }
         public BloodType BloodType { get; set; }
         public bool IsActive { get; set; }
         public DateTime LastDonationDate { get; set; }

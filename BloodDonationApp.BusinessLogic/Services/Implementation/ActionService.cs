@@ -7,8 +7,10 @@ using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Action;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
+using Common.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Dynamic;
 using System.Linq.Expressions;
 
 namespace BloodDonationApp.BusinessLogic.Services.Implementation
@@ -17,11 +19,13 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
     {
         private readonly IUnitOfWork uow;
         private readonly ILoggerManager _logger;
+        private readonly IDataShaper<GetTransfusionActionDTO> _dataShaper;
         private readonly ActionMapper _mapper = new ActionMapper();
-        public ActionService(IUnitOfWork unitOfWork, ILoggerManager logger)
+        public ActionService(IUnitOfWork unitOfWork, ILoggerManager logger, IDataShaper<GetTransfusionActionDTO> dataShaper)
         {
             uow = unitOfWork;
             _logger = logger;
+            _dataShaper = dataShaper;
         }
         public async Task<ApiBaseResponse> Delete(int actionID)
         {
@@ -42,13 +46,14 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             return new ApiOkResponse<GetTransfusionActionDTO>(actionDTO);
         }
 
-        public async Task<ApiBaseResponse> GetAll(bool trackChanges)
+        public async Task<ApiBaseResponse> GetAll(bool trackChanges, ActionParameters actionParameters)
         {
             _logger.LogInformation("GetAll from ActionService");
-            var query = uow.ActionRepository.GetAllActions(trackChanges);
+            var query = uow.ActionRepository.GetAllActions(trackChanges, actionParameters);
             var actions = await query.ToListAsync();
             var actionsDTO = actions.Select(a => _mapper.ToDto(a)).ToList();
-            return new ApiOkResponse<IEnumerable<GetTransfusionActionDTO>>(actionsDTO);
+            var shapedActionsData = _dataShaper.ShapeData(actionsDTO, actionParameters.Fields);
+            return new ApiOkResponse<IEnumerable<ExpandoObject>>(shapedActionsData);
         }
 
         public async Task<ApiBaseResponse> GetByCondition(Expression<Func<TransfusionAction, bool>> condition, bool trackChanges)

@@ -4,7 +4,6 @@ using BloodDonationApp.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,11 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BloodDonationApp.Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationContext))]
-    [Migration("20240612223603_InitialMigration")]
-    partial class InitialMigration
+    partial class BloodDonationContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,6 +56,43 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     b.HasIndex("ActionID");
 
                     b.ToTable("CallsToDonate");
+
+                    b.HasData(
+                        new
+                        {
+                            JMBG = "0101995700001",
+                            ActionID = 1,
+                            AcceptedTheCall = true,
+                            ShowedUp = true
+                        },
+                        new
+                        {
+                            JMBG = "0101995700001",
+                            ActionID = 2,
+                            AcceptedTheCall = false,
+                            ShowedUp = false
+                        },
+                        new
+                        {
+                            JMBG = "0101995700001",
+                            ActionID = 3,
+                            AcceptedTheCall = true,
+                            ShowedUp = false
+                        },
+                        new
+                        {
+                            JMBG = "0101995700001",
+                            ActionID = 4,
+                            AcceptedTheCall = true,
+                            ShowedUp = true
+                        },
+                        new
+                        {
+                            JMBG = "0101995700001",
+                            ActionID = 5,
+                            AcceptedTheCall = false,
+                            ShowedUp = true
+                        });
                 });
 
             modelBuilder.Entity("BloodDonationApp.Domain.DomainModel.CallToVolunteer", b =>
@@ -80,6 +114,43 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     b.HasIndex("ActionID");
 
                     b.ToTable("CallsToVolunteer");
+
+                    b.HasData(
+                        new
+                        {
+                            VolunteerID = 1,
+                            ActionID = 1,
+                            AcceptedTheCall = true,
+                            ShowedUp = true
+                        },
+                        new
+                        {
+                            VolunteerID = 1,
+                            ActionID = 2,
+                            AcceptedTheCall = true,
+                            ShowedUp = false
+                        },
+                        new
+                        {
+                            VolunteerID = 1,
+                            ActionID = 3,
+                            AcceptedTheCall = false,
+                            ShowedUp = true
+                        },
+                        new
+                        {
+                            VolunteerID = 1,
+                            ActionID = 4,
+                            AcceptedTheCall = false,
+                            ShowedUp = false
+                        },
+                        new
+                        {
+                            VolunteerID = 1,
+                            ActionID = 5,
+                            AcceptedTheCall = true,
+                            ShowedUp = true
+                        });
                 });
 
             modelBuilder.Entity("BloodDonationApp.Domain.DomainModel.Donor", b =>
@@ -111,6 +182,9 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     b.Property<int>("PlaceID")
                         .HasColumnType("int");
 
+                    b.Property<int>("Sex")
+                        .HasColumnType("int");
+
                     b.HasKey("JMBG");
 
                     b.HasIndex("PlaceID");
@@ -127,18 +201,20 @@ namespace BloodDonationApp.Infrastructure.Migrations
                             IsActive = true,
                             LastDonationDate = new DateTime(2024, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Password = "comi",
-                            PlaceID = 12
+                            PlaceID = 12,
+                            Sex = 0
                         },
                         new
                         {
-                            JMBG = "0202995800002",
+                            JMBG = "1104345940234",
                             BloodType = 4,
                             DonorEmailAddress = "vladimir.lazarevic@fonis.rs",
                             DonorFullName = "Vladimir Lazarevic",
                             IsActive = true,
                             LastDonationDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Password = "vlada",
-                            PlaceID = 4
+                            PlaceID = 4,
+                            Sex = 0
                         },
                         new
                         {
@@ -149,7 +225,8 @@ namespace BloodDonationApp.Infrastructure.Migrations
                             IsActive = true,
                             LastDonationDate = new DateTime(2023, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Password = "srdjkc",
-                            PlaceID = 1
+                            PlaceID = 1,
+                            Sex = 1
                         },
                         new
                         {
@@ -160,18 +237,56 @@ namespace BloodDonationApp.Infrastructure.Migrations
                             IsActive = false,
                             LastDonationDate = new DateTime(2023, 5, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Password = "nmnj",
-                            PlaceID = 2
+                            PlaceID = 2,
+                            Sex = 0
                         },
                         new
                         {
-                            JMBG = "1104345940234",
+                            JMBG = "1604345940234",
                             BloodType = 1,
                             DonorEmailAddress = "djordjemirkovic001@gmail.com",
                             DonorFullName = "Djordje Mirkovic",
                             IsActive = true,
                             LastDonationDate = new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Password = "djole",
-                            PlaceID = 2
+                            PlaceID = 2,
+                            Sex = 0
+                        },
+                        new
+                        {
+                            JMBG = "1104001765020",
+                            BloodType = 1,
+                            DonorEmailAddress = "saki@gmail.com",
+                            DonorFullName = "Sandra Kovacevic",
+                            IsActive = true,
+                            LastDonationDate = new DateTime(2022, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Password = "sakisan",
+                            PlaceID = 6,
+                            Sex = 1
+                        },
+                        new
+                        {
+                            JMBG = "1107001543432",
+                            BloodType = 1,
+                            DonorEmailAddress = "pera@gmail.com",
+                            DonorFullName = "Petar Nikodijevic",
+                            IsActive = true,
+                            LastDonationDate = new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Password = "pera",
+                            PlaceID = 1,
+                            Sex = 0
+                        },
+                        new
+                        {
+                            JMBG = "1505001498898",
+                            BloodType = 6,
+                            DonorEmailAddress = "kotlajic@gmail.com",
+                            DonorFullName = "Stefan Kotlaja",
+                            IsActive = true,
+                            LastDonationDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Password = "kotlaja",
+                            PlaceID = 11,
+                            Sex = 0
                         });
                 });
 
@@ -214,6 +329,20 @@ namespace BloodDonationApp.Infrastructure.Migrations
                             OfficialFullName = "Dunja Nesic",
                             Password = "123",
                             Username = "dule42"
+                        },
+                        new
+                        {
+                            OfficialID = 2,
+                            OfficialFullName = "Stefan Jovanovic",
+                            Password = "456",
+                            Username = "stefanJov3107"
+                        },
+                        new
+                        {
+                            OfficialID = 3,
+                            OfficialFullName = "Pavle Gasic",
+                            Password = "789",
+                            Username = "gasa"
                         });
                 });
 
@@ -671,7 +800,7 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         new
                         {
                             ActionID = 4,
-                            ActionDate = new DateTime(2024, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ActionDate = new DateTime(2024, 8, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ActionName = "Krv za zivot",
                             ActionTimeFromTo = "11:00 - 17:00",
                             ExactLocation = "Opšta bolnica Niš",
@@ -741,15 +870,15 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         new
                         {
                             VolunteerID = 1,
-                            DateFreeFrom = new DateTime(2024, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateFreeTo = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Password = "leptirica",
-                            RedCrossID = 1,
+                            DateFreeFrom = new DateTime(2024, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateFreeTo = new DateTime(2024, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(2001, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Password = "poz",
+                            RedCrossID = 2,
                             Sex = 1,
-                            Username = "minja",
-                            VolunteerEmailAddress = "filip.minja95@gmail.com",
-                            VolunteerFullName = "Minja Filip"
+                            Username = "pozitiva",
+                            VolunteerEmailAddress = "iva.djokovic@fonis.rs",
+                            VolunteerFullName = "Iva Djokovic"
                         },
                         new
                         {
@@ -767,45 +896,19 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         new
                         {
                             VolunteerID = 3,
-                            DateFreeFrom = new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateFreeTo = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Password = "sof",
-                            RedCrossID = 1,
-                            Sex = 1,
-                            Username = "sofija",
-                            VolunteerEmailAddress = "sfilip2022.10215@atssb.edu.rs",
-                            VolunteerFullName = "Sofija Filip"
+                            DateFreeFrom = new DateTime(2024, 3, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateFreeTo = new DateTime(2024, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(2001, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Password = "pedja",
+                            RedCrossID = 4,
+                            Sex = 0,
+                            Username = "djpedja",
+                            VolunteerEmailAddress = "predrag.tanaskovic@fonis.rs",
+                            VolunteerFullName = "Predrag Tanaskovic"
                         },
                         new
                         {
                             VolunteerID = 4,
-                            DateFreeFrom = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateFreeTo = new DateTime(2024, 4, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2002, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Password = "nesic",
-                            RedCrossID = 1,
-                            Sex = 1,
-                            Username = "vasa",
-                            VolunteerEmailAddress = "nesicvasilije02@gmail.com",
-                            VolunteerFullName = "Vasilije Nesic"
-                        },
-                        new
-                        {
-                            VolunteerID = 5,
-                            DateFreeFrom = new DateTime(2024, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateFreeTo = new DateTime(2024, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2001, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Password = "poz",
-                            RedCrossID = 2,
-                            Sex = 1,
-                            Username = "pozitiva",
-                            VolunteerEmailAddress = "iva.djokovic@fonis.rs",
-                            VolunteerFullName = "Iva Djokovic"
-                        },
-                        new
-                        {
-                            VolunteerID = 6,
                             DateFreeFrom = new DateTime(2024, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateFreeTo = new DateTime(2024, 5, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(2001, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -818,16 +921,42 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         },
                         new
                         {
-                            VolunteerID = 7,
-                            DateFreeFrom = new DateTime(2024, 3, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateFreeTo = new DateTime(2024, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2001, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Password = "pedja",
-                            RedCrossID = 4,
+                            VolunteerID = 5,
+                            DateFreeFrom = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateFreeTo = new DateTime(2024, 4, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(2002, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Password = "nesic",
+                            RedCrossID = 1,
                             Sex = 0,
-                            Username = "djpedja",
-                            VolunteerEmailAddress = "predrag.tanaskovic@fonis.rs",
-                            VolunteerFullName = "Predrag Tanaskovic"
+                            Username = "vasa",
+                            VolunteerEmailAddress = "nesicvasilije02@gmail.com",
+                            VolunteerFullName = "Vasilije Nesic"
+                        },
+                        new
+                        {
+                            VolunteerID = 6,
+                            DateFreeFrom = new DateTime(2024, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateFreeTo = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Password = "leptirica",
+                            RedCrossID = 1,
+                            Sex = 1,
+                            Username = "minja",
+                            VolunteerEmailAddress = "filip.minja95@gmail.com",
+                            VolunteerFullName = "Minja Filip"
+                        },
+                        new
+                        {
+                            VolunteerID = 7,
+                            DateFreeFrom = new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateFreeTo = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Password = "sof",
+                            RedCrossID = 1,
+                            Sex = 1,
+                            Username = "sofija",
+                            VolunteerEmailAddress = "sfilip2022.10215@atssb.edu.rs",
+                            VolunteerFullName = "Sofija Filip"
                         });
                 });
 

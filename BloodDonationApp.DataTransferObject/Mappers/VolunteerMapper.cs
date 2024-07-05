@@ -12,7 +12,7 @@ namespace BloodDonationApp.DataTransferObject.Mappers
             VolunteerFullName = volunteer.VolunteerFullName,
             DateFreeFrom = volunteer.DateFreeFrom,
             DateFreeTo = volunteer.DateFreeTo,
-            PlaceName = volunteer.RedCross?.InstitutionName ?? "Nepoznata institucija volontiranja",
+            RedCross = volunteer.RedCross?.InstitutionName ?? "Nepoznata institucija volontiranja",
             ListOfActions = (volunteer.ListOfActions ?? Enumerable.Empty<TransfusionAction>())
             .Select(action => new GetTransfusionActionDTO
             {

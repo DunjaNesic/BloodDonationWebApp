@@ -1,5 +1,6 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
 using BloodDonationApp.DataAccessLayer.UnitOfWork;
+using BloodDonationApp.DataTransferObject.Action;
 using BloodDonationApp.DataTransferObject.Donors;
 using BloodDonationApp.DataTransferObject.Mappers;
 using BloodDonationApp.Domain.DomainModel;
@@ -21,9 +22,9 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         private readonly Lazy<IQuestionService> _questionService;
         private readonly Lazy<IVolunteerService> _volunteerService;
 
-        public ServiceManager(IUnitOfWork uow, ILoggerManager _logger)
+        public ServiceManager(IUnitOfWork uow, ILoggerManager _logger, IDataShaper<GetTransfusionActionDTO> _dataShaper)
         {
-            _actionService = new Lazy<IActionService>(() => new ActionService(uow, _logger));
+            _actionService = new Lazy<IActionService>(() => new ActionService(uow, _logger, _dataShaper));
             _donorService = new Lazy<IDonorService>(() => new DonorService(uow, _logger));
             _placeService = new Lazy<IPlaceService>(() => new PlaceService(uow));
             _questionnaireService = new Lazy<IQuestionnaireService>(() => new QuestionnaireService(uow, _logger));

@@ -1,5 +1,6 @@
 ﻿using BloodDonationApp.DataAccessLayer.BaseRepository;
 using BloodDonationApp.Domain.DomainModel;
+using Common.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace BloodDonationApp.DataAccessLayer.VolunteerRepo
     public interface IVolunteerRepository : IRepository<Volunteer>
     {
         Task<Volunteer?> GetVolunteer(Expression<Func<Volunteer, bool>> condition, bool trackChanges);
-        IQueryable<Volunteer> GetAllVolunteers(bool trackChanges);
+        IQueryable<Volunteer> GetAllVolunteers(bool trackChanges, VolunteerParameters volunteerParameters);
         IQueryable<Volunteer> GetVolunteersByCondition(Expression<Func<Volunteer, bool>> condition, bool trackChanges);
         Task<IEnumerable<TransfusionAction>> GetActions(int volunteerID);
         Task<IEnumerable<TransfusionAction>> GetIncomingAction(int volunteerID);

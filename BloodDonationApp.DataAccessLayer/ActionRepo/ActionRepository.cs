@@ -1,6 +1,8 @@
 ﻿using BloodDonationApp.DataAccessLayer.BaseRepository;
+using BloodDonationApp.DataAccessLayer.Extensions;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Infrastructure;
+using Common.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -13,7 +15,7 @@ namespace BloodDonationApp.DataAccessLayer.ActionRepo
         {
             _context = context;
         }
-        public IQueryable<TransfusionAction> GetAllActions(bool trackChanges)
+        public IQueryable<TransfusionAction> GetAllActions(bool trackChanges, ActionParameters actionParameters)
         {
             var includes = new Expression<Func<TransfusionAction, object>>[]
             {
@@ -23,7 +25,13 @@ namespace BloodDonationApp.DataAccessLayer.ActionRepo
                  a => a.ListOfCallsToVolunteers
             };
 
-            var query = GetAll(trackChanges, includes);
+            var query = GetAll(trackChanges, includes)
+                .Filter(actionParameters.MinDate, actionParameters.MaxDate)
+                .Search(actionParameters.Search)
+                .OrderBy(a => a.Place)
+                .Skip((actionParameters.PageNumber - 1)*actionParameters.PageSize)
+                .Take(actionParameters.PageSize)
+                ;
 
             return query;
         }

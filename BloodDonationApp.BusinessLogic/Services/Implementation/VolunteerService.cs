@@ -13,6 +13,7 @@ using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Donor;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Volunteer;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
+using Common.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
@@ -72,10 +73,10 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             return new ApiOkResponse<string>("Volunteer deleted successfully");
         }
 
-        public async Task<ApiBaseResponse> GetAll(bool trackChanges)
+        public async Task<ApiBaseResponse> GetAll(bool trackChanges, VolunteerParameters volunteerParameters)
         {
             _logger.LogInformation("GetAll from VolunteerService");
-            var query = uow.VolunteerRepository.GetAllVolunteers(trackChanges);
+            var query = uow.VolunteerRepository.GetAllVolunteers(trackChanges, volunteerParameters);
             var volunteers = await query.ToListAsync();
             var volunteersDTO = volunteers.Select(volunteer => _mapper.ToDto(volunteer)).ToList();
             return new ApiOkResponse<IEnumerable<GetVolunteerDTO>>(volunteersDTO);

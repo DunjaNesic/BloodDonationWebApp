@@ -1,6 +1,8 @@
 ﻿using BloodDonationApp.DataAccessLayer.BaseRepository;
+using BloodDonationApp.DataAccessLayer.Extensions;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Infrastructure;
+using Common.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,19 +20,27 @@ namespace BloodDonationApp.DataAccessLayer.DonorRepo
         {
             _context = context;
         }
-        public IQueryable<Donor> GetAllDonors(bool trackChanges)
+        public IQueryable<Donor> GetAllDonors(bool trackChanges, DonorParameters donorParameters)
         {
             var includes = new Expression<Func<Donor, object>>[]
           {
                  d => d.Place,
+                 d => d.Place,
                  d => d.ListOfActions,
                  d => d.ListOfQuestionnaires,
                  d => d.CallsToDonate
-          };
-            var query = GetAll(trackChanges, includes);
+          };            
+
+            var query = GetAll(trackChanges, includes)
+                .Filter(donorParameters.NextDonationDate, donorParameters.IsActive, donorParameters.BloodType, donorParameters.Sex, donorParameters.PlaceID)
+                .Search(donorParameters.Search)
+                .Sort(donorParameters.OrderBy)
+                .Skip((donorParameters.PageNumber - 1) * donorParameters.PageSize)
+                .Take(donorParameters.PageSize);  
+
             return query;
         }
-        public IQueryable<Donor> GetBySomeCondition(Expression<Func<Donor, bool>> condition, bool trackChanges)
+        public IQueryable<Donor> GetDonorsByCondition(Expression<Func<Donor, bool>> condition, bool trackChanges)
         {
             var includes = new Expression<Func<Donor, object>>[]
           {
@@ -46,7 +56,7 @@ namespace BloodDonationApp.DataAccessLayer.DonorRepo
         public async Task<Donor?> GetByJMBG(string JMBG)
         {
             var donor = await _context.Donors
-                .Include(d => d.Place)
+                .Include(d => d.Place).Include(d => d.CallsToDonate)
                 .Where(d => d.JMBG.ToLower().Equals(JMBG.ToLower())).SingleOrDefaultAsync();
 
             return donor;

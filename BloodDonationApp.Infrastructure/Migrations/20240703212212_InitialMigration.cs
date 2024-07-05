@@ -48,6 +48,7 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DonorFullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DonorEmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Sex = table.Column<int>(type: "int", nullable: false),
                     BloodType = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     LastDonationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -299,7 +300,12 @@ namespace BloodDonationApp.Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "Officials",
                 columns: new[] { "OfficialID", "Discriminator", "OfficialFullName", "Password", "Username" },
-                values: new object[] { 1, "Official", "Dunja Nesic", "123", "dule42" });
+                values: new object[,]
+                {
+                    { 1, "Official", "Dunja Nesic", "123", "dule42" },
+                    { 2, "Official", "Stefan Jovanovic", "456", "stefanJov3107" },
+                    { 3, "Official", "Pavle Gasic", "789", "gasa" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Places",
@@ -351,14 +357,17 @@ namespace BloodDonationApp.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "Donors",
-                columns: new[] { "JMBG", "BloodType", "DonorEmailAddress", "DonorFullName", "IsActive", "LastDonationDate", "Password", "PlaceID" },
+                columns: new[] { "JMBG", "BloodType", "DonorEmailAddress", "DonorFullName", "IsActive", "LastDonationDate", "Password", "PlaceID", "Sex" },
                 values: new object[,]
                 {
-                    { "0101995700001", 6, "mijailovicmladen5@gmail.com", "Mladen Mijailovic", true, new DateTime(2024, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "comi", 12 },
-                    { "0202995800002", 4, "vladimir.lazarevic@fonis.rs", "Vladimir Lazarevic", true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "vlada", 4 },
-                    { "0303995900003", 5, "sara.jana.djokic@gmail.com", "Sara Djokic", true, new DateTime(2023, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "srdjkc", 1 },
-                    { "0407945940004", 2, "markovicc26@gmail.com", "Nemanja Markovic", false, new DateTime(2023, 5, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), "nmnj", 2 },
-                    { "1104345940234", 1, "djordjemirkovic001@gmail.com", "Djordje Mirkovic", true, new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "djole", 2 }
+                    { "0101995700001", 6, "mijailovicmladen5@gmail.com", "Mladen Mijailovic", true, new DateTime(2024, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "comi", 12, 0 },
+                    { "0303995900003", 5, "sara.jana.djokic@gmail.com", "Sara Djokic", true, new DateTime(2023, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "srdjkc", 1, 1 },
+                    { "0407945940004", 2, "markovicc26@gmail.com", "Nemanja Markovic", false, new DateTime(2023, 5, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), "nmnj", 2, 0 },
+                    { "1104001765020", 1, "saki@gmail.com", "Sandra Kovacevic", true, new DateTime(2022, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "sakisan", 6, 1 },
+                    { "1104345940234", 4, "vladimir.lazarevic@fonis.rs", "Vladimir Lazarevic", true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "vlada", 4, 0 },
+                    { "1107001543432", 1, "pera@gmail.com", "Petar Nikodijevic", true, new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "pera", 1, 0 },
+                    { "1505001498898", 6, "kotlajic@gmail.com", "Stefan Kotlaja", true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "kotlaja", 11, 0 },
+                    { "1604345940234", 1, "djordjemirkovic001@gmail.com", "Djordje Mirkovic", true, new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "djole", 2, 0 }
                 });
 
             migrationBuilder.InsertData(
@@ -380,8 +389,20 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     { 1, new DateTime(2024, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "FON humanitarna akcija", "10:00 - 16:00", "Fakultet organizacionih nauka", 1, 2, new byte[0] },
                     { 2, new DateTime(2024, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sportski centar Smederevo", "08:00 - 18:00", "Sportski centar", 1, 1, new byte[0] },
                     { 3, new DateTime(2024, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), "Dobrovoljno davanje krvi u Vozdovim kapijama", "09:00 - 14:00", "Crveni Krst Vozdovac", 1, 2, new byte[0] },
-                    { 4, new DateTime(2024, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "Krv za zivot", "11:00 - 17:00", "Opšta bolnica Niš", 1, 6, new byte[0] },
+                    { 4, new DateTime(2024, 8, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "Krv za zivot", "11:00 - 17:00", "Opšta bolnica Niš", 1, 6, new byte[0] },
                     { 5, new DateTime(2024, 7, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), "Daj krv, spasi zivot", "10:00 - 15:00", "Dom Zdravlja NP", 1, 12, new byte[0] }
+                });
+
+            migrationBuilder.InsertData(
+                table: "CallsToDonate",
+                columns: new[] { "ActionID", "JMBG", "AcceptedTheCall", "ShowedUp" },
+                values: new object[,]
+                {
+                    { 1, "0101995700001", true, true },
+                    { 2, "0101995700001", false, false },
+                    { 3, "0101995700001", true, false },
+                    { 4, "0101995700001", true, true },
+                    { 5, "0101995700001", false, true }
                 });
 
             migrationBuilder.InsertData(
@@ -399,13 +420,25 @@ namespace BloodDonationApp.Infrastructure.Migrations
                 columns: new[] { "VolunteerID", "DateFreeFrom", "DateFreeTo", "DateOfBirth", "Password", "RedCrossID", "Sex", "Username", "VolunteerEmailAddress", "VolunteerFullName" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "leptirica", 1, 1, "minja", "filip.minja95@gmail.com", "Minja Filip" },
+                    { 1, new DateTime(2024, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified), "poz", 2, 1, "pozitiva", "iva.djokovic@fonis.rs", "Iva Djokovic" },
                     { 2, new DateTime(2024, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 7, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 7, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "nensi", 2, 1, "nensi", "nevenadukic4@gmail.com", "Nevena Dukic" },
-                    { 3, new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "sof", 1, 1, "sofija", "sfilip2022.10215@atssb.edu.rs", "Sofija Filip" },
-                    { 4, new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "nesic", 1, 1, "vasa", "nesicvasilije02@gmail.com", "Vasilije Nesic" },
-                    { 5, new DateTime(2024, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified), "poz", 2, 1, "pozitiva", "iva.djokovic@fonis.rs", "Iva Djokovic" },
-                    { 6, new DateTime(2024, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 5, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), "zephe", 1, 0, "zippy", "zippy@gmail.com", "Veljko Nedeljkovic" },
-                    { 7, new DateTime(2024, 3, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "pedja", 4, 0, "djpedja", "predrag.tanaskovic@fonis.rs", "Predrag Tanaskovic" }
+                    { 3, new DateTime(2024, 3, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "pedja", 4, 0, "djpedja", "predrag.tanaskovic@fonis.rs", "Predrag Tanaskovic" },
+                    { 4, new DateTime(2024, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 5, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), "zephe", 1, 0, "zippy", "zippy@gmail.com", "Veljko Nedeljkovic" },
+                    { 5, new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "nesic", 1, 0, "vasa", "nesicvasilije02@gmail.com", "Vasilije Nesic" },
+                    { 6, new DateTime(2024, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "leptirica", 1, 1, "minja", "filip.minja95@gmail.com", "Minja Filip" },
+                    { 7, new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "sof", 1, 1, "sofija", "sfilip2022.10215@atssb.edu.rs", "Sofija Filip" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "CallsToVolunteer",
+                columns: new[] { "ActionID", "VolunteerID", "AcceptedTheCall", "ShowedUp" },
+                values: new object[,]
+                {
+                    { 1, 1, true, true },
+                    { 2, 1, true, false },
+                    { 3, 1, false, true },
+                    { 4, 1, false, false },
+                    { 5, 1, true, true }
                 });
 
             migrationBuilder.CreateIndex(

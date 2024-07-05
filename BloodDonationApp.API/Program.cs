@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
 using BloodDonationApp.Presentation.ActionFilters;
+using BloodDonationApp.DataTransferObject.Action;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,7 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddDbContext<BloodDonationContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
+builder.Services.AddScoped<IDataShaper<GetTransfusionActionDTO>, DataShaper<GetTransfusionActionDTO>>();
 builder.Services.ConfigureCors();
 builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureSqlServerContext(builder.Configuration);

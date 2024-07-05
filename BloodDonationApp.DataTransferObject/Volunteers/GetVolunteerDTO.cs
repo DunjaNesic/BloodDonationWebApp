@@ -16,7 +16,7 @@ namespace BloodDonationApp.DataTransferObject.Volunteers
         public string VolunteerFullName { get; set; } = string.Empty;
         public DateTime DateFreeFrom { get; set; }
         public DateTime DateFreeTo { get; set; }
-        public string PlaceName { get; set; } = string.Empty;
+        public string RedCross { get; set; } = string.Empty;
         public List<GetTransfusionActionDTO> ListOfActions { get; set; } = new List<GetTransfusionActionDTO> { };
     }
 }

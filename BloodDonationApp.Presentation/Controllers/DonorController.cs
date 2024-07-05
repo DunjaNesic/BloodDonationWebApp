@@ -1,6 +1,7 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
 using BloodDonationApp.DataTransferObject.Donors;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
+using Common.RequestFeatures;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -18,9 +19,9 @@ namespace BloodDonationApp.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetDonorDTO>>> GetAllDonors()
+        public async Task<ActionResult<IEnumerable<GetDonorDTO>>> GetAllDonors([FromQuery] DonorParameters donorParameters)
         {
-            var baseResult = await _serviceManager.DonorService.GetAll(trackChanges: false);
+            var baseResult = await _serviceManager.DonorService.GetAll(trackChanges: false, donorParameters);
             if (!baseResult.Success) return ProcessError(baseResult);
 
             var donors = baseResult.GetResult<IEnumerable<GetDonorDTO>>();

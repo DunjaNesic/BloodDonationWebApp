@@ -10,6 +10,7 @@ using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Action;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Donor;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
+using Common.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
 
 namespace BloodDonationApp.BusinessLogic.Services.Implementation
@@ -25,10 +26,10 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             uow = unitOfWork;   
             _logger = logger;
         }
-        public async Task<ApiBaseResponse> GetAll(bool trackChanges)
+        public async Task<ApiBaseResponse> GetAll(bool trackChanges, DonorParameters donorParameters)
         {
             _logger.LogInformation("GetAll from DonorService");
-            var query = uow.DonorRepository.GetAllDonors(trackChanges);
+            var query = uow.DonorRepository.GetAllDonors(trackChanges, donorParameters);
             var donors = await query.ToListAsync();
             var donorsDTO = donors.Select(donor => _mapper.ToDto(donor)).ToList();
             return new ApiOkResponse<IEnumerable<GetDonorDTO>>(donorsDTO);

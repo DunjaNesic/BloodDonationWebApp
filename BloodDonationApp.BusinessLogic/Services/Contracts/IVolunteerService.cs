@@ -1,5 +1,6 @@
 ﻿using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
+using Common.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
 {
     public interface IVolunteerService
     {
-        Task<ApiBaseResponse> GetAll(bool trackChanges);
+        Task<ApiBaseResponse> GetAll(bool trackChanges, VolunteerParameters volunteerParameters);
         Task<ApiBaseResponse> GetByCondition(Expression<Func<Volunteer, bool>> condition, bool trackChanges);
         Task<ApiBaseResponse> GetVolunteer(int volunteerID);
         Task<ApiBaseResponse> Create(Volunteer v);

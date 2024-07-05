@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using BloodDonationApp.Presentation.ActionFilters;
+using Common.RequestFeatures;
+using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Volunteer;
+using BloodDonationApp.DataTransferObject.Donors;
 
 namespace BloodDonationApp.Presentation
 {
@@ -23,9 +26,9 @@ namespace BloodDonationApp.Presentation
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetVolunteerDTO>>> GetAllVolunteers()
-        {
-            var baseResult = await _serviceManager.VolunteerService.GetAll(trackChanges: false);
+        public async Task<ActionResult<IEnumerable<GetVolunteerDTO>>> GetAllVolunteers([FromQuery] VolunteerParameters volunteerParameters)
+        { 
+            var baseResult = await _serviceManager.VolunteerService.GetAll(trackChanges: false, volunteerParameters);
             if (!baseResult.Success) return ProcessError(baseResult);           
 
             var volunteers = baseResult.GetResult<IEnumerable<GetVolunteerDTO>>();
@@ -33,20 +36,17 @@ namespace BloodDonationApp.Presentation
         }
 
         [HttpGet]
-        [Route("{partialName}")]
-        public async Task<ActionResult<IEnumerable<GetVolunteerDTO>>> FindVolunteersByName(string partialName)
+        [Route("{volunteerID}")]
+
+        public async Task<ActionResult<GetVolunteerDTO>> GetVolunteer(int volunteerID)
         {
-            Expression<Func<Volunteer, bool>> condition = v => v.VolunteerFullName.ToLower().Contains(partialName.ToLower());
-            var baseResult = await _serviceManager.VolunteerService.GetByCondition(condition, false);
+            var baseResult = await _serviceManager.VolunteerService.GetVolunteer(volunteerID);
+            if (!baseResult.Success) return ProcessError(baseResult);
 
-            if (!baseResult.Success)
-                return ProcessError(baseResult);
+            var foundVolunteer = baseResult.GetResult<GetVolunteerDTO>();
 
-            var filteredVolunteers = baseResult.GetResult<IEnumerable<GetVolunteerDTO>>();
-
-            return Ok(filteredVolunteers);
+            return Ok(foundVolunteer);
         }
-
 
         //[HttpPost]
         //[ServiceFilter(typeof(ValidationFilterAttribute))]
