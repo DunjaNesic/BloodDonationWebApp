@@ -39,11 +39,19 @@ builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureSqlServerContext(builder.Configuration);
 builder.Services.ConfigureUnitOfWork();
 builder.Services.ConfigureServiceManager();
+//builder.Services.ConfigureResponseCaching();
+builder.Services.ConfigureOutputCaching();
+builder.Services.ConfigureRateLimitingOptions();
 
 builder.Services.AddControllers(config =>
 {
     config.RespectBrowserAcceptHeader = true;
     config.ReturnHttpNotAcceptable = true;
+    //necemo response cachinggg
+    //config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+    //{
+    //    Duration = 120
+    //});
 }).AddXmlDataContractSerializerFormatters()
     .AddApplicationPart(typeof(BloodDonationApp.Presentation.AssemblyReference).Assembly);
 
@@ -83,7 +91,10 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.All
 });
 
+app.UseRateLimiter();
 app.UseCors("CorsPolicy");
+//app.UseResponseCaching();
+app.UseOutputCache();
 
 app.UseAuthentication();
 

@@ -9,6 +9,8 @@ using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using BloodDonationApp.Presentation.ActionFilters;
 using Common.RequestFeatures;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Net.Http.Headers;
 using System.Dynamic;
@@ -24,6 +26,9 @@ namespace BloodDonationApp.Presentation.Controllers
     }
 
     [ApiController]
+    //[ResponseCache(CacheProfileName = "120SecondsDuration")] 
+    [OutputCache(PolicyName = "120SecondsDuration")]
+    [EnableRateLimiting("SpecificActionsPolicy")]
     [Route("itk/actions")]
     public class ActionController : ApiBaseController
     {
@@ -66,6 +71,8 @@ namespace BloodDonationApp.Presentation.Controllers
         }
 
         [HttpGet("{actionID}")]
+        //[ResponseCache(Duration = 13)] 
+        [OutputCache(Duration = 13)]
         public async Task<ActionResult<GetTransfusionActionDTO>> GetAction(int actionID)
         {
             var baseResult = await _serviceManager.ActionService.GetAction(actionID);
