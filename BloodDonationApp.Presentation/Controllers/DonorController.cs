@@ -23,7 +23,7 @@ namespace BloodDonationApp.Presentation.Controllers
         {
             var baseResult = await _serviceManager.DonorService.GetAll(trackChanges: false, donorParameters);
             if (!baseResult.Success) return ProcessError(baseResult);
-
+        
             var donors = baseResult.GetResult<IEnumerable<GetDonorDTO>>();
 
             return Ok(donors);

@@ -14,7 +14,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
     {
         Task<ApiBaseResponse> Delete(int actionID);
         Task<ApiBaseResponse> GetAll(bool trackChanges, ActionParameters actionParameters);
-        Task<ApiBaseResponse> GetAction(int actionID);
+        Task<ApiBaseResponse> GetAction(int actionID, string fields = "");
         Task<ApiBaseResponse> GetByCondition(Expression<Func<TransfusionAction, bool>> condition, bool trackChanges);
 
     }

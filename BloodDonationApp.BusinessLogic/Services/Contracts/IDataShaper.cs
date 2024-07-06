@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BloodDonationApp.Domain.CustomModel;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
 {
     public interface IDataShaper<T>
     {
-        IEnumerable<ExpandoObject> ShapeData(IEnumerable<T> entities, string fieldsString);
-        ExpandoObject ShapeData(T entity, string fieldsString);
+        IEnumerable<ShapedCustomExpando> ShapeData(IEnumerable<T> entities, string fieldsString);
+        ShapedCustomExpando ShapeData(T entity, string fieldsString);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
+using BloodDonationApp.Domain.CustomModel;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -16,13 +17,13 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         {
             Properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
         }
-        public IEnumerable<ExpandoObject> ShapeData(IEnumerable<T> entities, string fieldsString)
+        public IEnumerable<ShapedCustomExpando> ShapeData(IEnumerable<T> entities, string fieldsString)
         {
             var requiredProperties = GetRequiredProperties(fieldsString);
 
             return FetchData(entities, requiredProperties);
         }
-        public ExpandoObject ShapeData(T entity, string fieldsString)
+        public ShapedCustomExpando ShapeData(T entity, string fieldsString)
         {
             var requiredProperties = GetRequiredProperties(fieldsString);
 
@@ -51,9 +52,9 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             }
             return requiredProperties;
         }
-        private IEnumerable<ExpandoObject> FetchData(IEnumerable<T> entities, IEnumerable<PropertyInfo> requiredProperties)
+        private IEnumerable<ShapedCustomExpando> FetchData(IEnumerable<T> entities, IEnumerable<PropertyInfo> requiredProperties)
         {
-            var shapedData = new List<ExpandoObject>();
+            var shapedData = new List<ShapedCustomExpando>();
 
             foreach (var entity in entities)
             {
@@ -62,15 +63,28 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             }
             return shapedData;
         }
-        private ExpandoObject FetchEntityData(T entity, IEnumerable<PropertyInfo> requiredProperties)
+        private ShapedCustomExpando FetchEntityData(T entity, IEnumerable<PropertyInfo> requiredProperties)
         {
-            var shapedObject = new ExpandoObject();
+            var shapedObject = new ShapedCustomExpando();
 
             foreach (var property in requiredProperties) 
             {
                 var objPropertyValue = property.GetValue(entity);
-                shapedObject.TryAdd(property.Name, objPropertyValue);
+                shapedObject.CustomExpando.Add(property.Name, objPropertyValue);
             }
+
+            var idProperty = entity.GetType().GetProperties().FirstOrDefault(p => p.Name.EndsWith("ID"));
+
+            if (idProperty != null)
+            {
+                var idPropertyValue = idProperty.GetValue(entity);
+                shapedObject.Id = Convert.ToInt32(idPropertyValue);
+            }
+            else
+            {
+                throw new InvalidOperationException("ID property not found in the shaped object.");
+            }
+
             return shapedObject;
         }
 

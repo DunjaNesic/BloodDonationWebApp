@@ -5,6 +5,7 @@ using BloodDonationApp.DataTransferObject.Donors;
 using BloodDonationApp.DataTransferObject.Mappers;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.LoggerService;
+using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         private readonly Lazy<IQuestionService> _questionService;
         private readonly Lazy<IVolunteerService> _volunteerService;
 
-        public ServiceManager(IUnitOfWork uow, ILoggerManager _logger, IDataShaper<GetTransfusionActionDTO> _dataShaper)
+        public ServiceManager(IUnitOfWork uow, ILoggerManager _logger, IDataShaper<GetTransfusionActionDTO> _dataShaper )
         {
             _actionService = new Lazy<IActionService>(() => new ActionService(uow, _logger, _dataShaper));
             _donorService = new Lazy<IDonorService>(() => new DonorService(uow, _logger));

@@ -22,6 +22,8 @@ builder.Services.AddScoped<ValidationFilterAttribute>();
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -31,6 +33,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
 builder.Services.AddScoped<IDataShaper<GetTransfusionActionDTO>, DataShaper<GetTransfusionActionDTO>>();
+builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 builder.Services.ConfigureCors();
 builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureSqlServerContext(builder.Configuration);
@@ -43,6 +46,9 @@ builder.Services.AddControllers(config =>
     config.ReturnHttpNotAcceptable = true;
 }).AddXmlDataContractSerializerFormatters()
     .AddApplicationPart(typeof(BloodDonationApp.Presentation.AssemblyReference).Assembly);
+
+//kad ovo stoji ovde onda dunja.xml radi kad stoji iznad onda ne radi a dunja.json ne radi nikad ??
+builder.Services.AddCustomMediaTypes();
 
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>

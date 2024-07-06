@@ -2,6 +2,7 @@
 using BloodDonationApp.DataAccessLayer.UnitOfWork;
 using BloodDonationApp.DataTransferObject.Action;
 using BloodDonationApp.DataTransferObject.Mappers;
+using BloodDonationApp.Domain.CustomModel;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Action;
@@ -27,6 +28,29 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             _logger = logger;
             _dataShaper = dataShaper;
         }
+        public async Task<ApiBaseResponse> GetAll(bool trackChanges, ActionParameters actionParameters)
+        {
+            _logger.LogInformation("GetAll from ActionService");
+            var query = uow.ActionRepository.GetAllActions(trackChanges, actionParameters);
+            var actions = await query.ToListAsync();
+            var actionsDTO = actions.Select(a => _mapper.ToDto(a)).ToList();
+            var shapedActionsData = _dataShaper.ShapeData(actionsDTO, actionParameters.Fields);
+            return new ApiOkResponse<IEnumerable<ShapedCustomExpando>>(shapedActionsData);
+        }
+        public async Task<ApiBaseResponse> GetAction(int actionID, string fields = "")
+        {
+            _logger.LogInformation("GetAction from ActionService");
+            var action = await uow.ActionRepository.GetAction(actionID);
+            if (action == null) return new ActionNotFoundResponse();
+            var actionDTO = _mapper.ToDto(action);
+            if (fields == "") return new ApiOkResponse<GetTransfusionActionDTO>(actionDTO);
+            else
+            {
+                ShapedCustomExpando shapedAction = _dataShaper.ShapeData(actionDTO, fields);
+                return new ApiOkResponse<ShapedCustomExpando>(shapedAction);
+            }
+        }
+
         public async Task<ApiBaseResponse> Delete(int actionID)
         {
             Expression<Func<TransfusionAction, bool>> condition = action => action.ActionID == actionID;
@@ -36,26 +60,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             await uow.SaveChanges();
             return new ApiOkResponse<string>("Action deleted successfully");
         }
-
-        public async Task<ApiBaseResponse> GetAction(int actionID)
-        {
-            _logger.LogInformation("GetAction from ActionService");
-            var action = await uow.ActionRepository.GetAction(actionID);
-            if (action == null) return new ActionNotFoundResponse();
-            var actionDTO = _mapper.ToDto(action);
-            return new ApiOkResponse<GetTransfusionActionDTO>(actionDTO);
-        }
-
-        public async Task<ApiBaseResponse> GetAll(bool trackChanges, ActionParameters actionParameters)
-        {
-            _logger.LogInformation("GetAll from ActionService");
-            var query = uow.ActionRepository.GetAllActions(trackChanges, actionParameters);
-            var actions = await query.ToListAsync();
-            var actionsDTO = actions.Select(a => _mapper.ToDto(a)).ToList();
-            var shapedActionsData = _dataShaper.ShapeData(actionsDTO, actionParameters.Fields);
-            return new ApiOkResponse<IEnumerable<ExpandoObject>>(shapedActionsData);
-        }
-
         public async Task<ApiBaseResponse> GetByCondition(Expression<Func<TransfusionAction, bool>> condition, bool trackChanges)
         {
             var query = uow.ActionRepository.GetActionsByCondition(condition, trackChanges);

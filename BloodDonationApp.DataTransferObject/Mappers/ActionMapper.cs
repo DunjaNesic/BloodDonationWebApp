@@ -13,6 +13,7 @@ namespace BloodDonationApp.DataTransferObject.Mappers
     {
         public GetTransfusionActionDTO ToDto(TransfusionAction action) => new()
         {
+            ActionID = action.ActionID,
             ActionName = action.ActionName,
             ActionDate = action.ActionDate, 
             ExactLocation = action.ExactLocation,

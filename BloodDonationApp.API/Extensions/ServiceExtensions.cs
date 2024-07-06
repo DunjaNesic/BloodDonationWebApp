@@ -6,6 +6,8 @@ using BloodDonationApp.DataTransferObject.Mappers; //proveri dal sme
 using BloodDonationApp.Domain.DomainModel; //proveri dal sme
 using BloodDonationApp.Infrastructure;
 using BloodDonationApp.LoggerService;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BloodDonationApp.API.Extensions
@@ -32,6 +34,32 @@ namespace BloodDonationApp.API.Extensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
         public static void ConfigureServiceManager(this IServiceCollection services) =>
             services.AddScoped<IServiceManager, ServiceManager>();
+
+        public static void AddCustomMediaTypes(this IServiceCollection services)
+        {
+            services.Configure<MvcOptions>(config =>
+            {
+                var systemTextJsonOutputFormatter = config.OutputFormatters
+                .OfType<SystemTextJsonOutputFormatter>()?
+                .FirstOrDefault();
+                if (systemTextJsonOutputFormatter != null)
+                {
+                    systemTextJsonOutputFormatter.SupportedMediaTypes
+                    .Add("application/vnd.dunja.hateoas+json");
+                    Console.WriteLine("Registered custom media type: application/vnd.dunja.hateoas+json");
+                }
+                var xmlOutputFormatter = config.OutputFormatters
+                .OfType<XmlDataContractSerializerOutputFormatter>()?
+                .FirstOrDefault();
+                if (xmlOutputFormatter != null)
+                {
+                    xmlOutputFormatter.SupportedMediaTypes
+                    .Add("application/vnd.dunja.hateoas+xml");
+                    Console.WriteLine("Registered custom media type: application/vnd.dunja.hateoas+xml");
+                }
+            });
+        }
+
 
 
     }

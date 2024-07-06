@@ -2,10 +2,15 @@
 using BloodDonationApp.DataTransferObject.Action;
 using BloodDonationApp.DataTransferObject.Donors;
 using BloodDonationApp.DataTransferObject.Volunteers;
+using BloodDonationApp.Domain.CustomModel;
 using BloodDonationApp.Domain.DomainModel;
+using BloodDonationApp.Domain.LinkModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
+using BloodDonationApp.Presentation.ActionFilters;
 using Common.RequestFeatures;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Net.Http.Headers;
 using System.Dynamic;
 using System.Linq.Expressions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -23,20 +28,41 @@ namespace BloodDonationApp.Presentation.Controllers
     public class ActionController : ApiBaseController
     {
         private readonly IServiceManager _serviceManager;
-        public ActionController(IServiceManager serviceManager)
+        private LinkGenerator _linkGenerator;
+        public ActionController(IServiceManager serviceManager, LinkGenerator linkGenerator)
         {
             _serviceManager = serviceManager;
+            _linkGenerator = linkGenerator;
         }
 
         [HttpGet]
+        [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         public async Task<ActionResult<IEnumerable<GetTransfusionActionDTO>>> GetAllActions([FromQuery] ActionParameters actionParameters )
         {
             var baseResult = await _serviceManager.ActionService.GetAll(false, actionParameters);
             if (!baseResult.Success) return ProcessError(baseResult);
 
-            var actions = baseResult.GetResult<IEnumerable<ExpandoObject>>();
+            var actions = baseResult.GetResult<IEnumerable<ShapedCustomExpando>>();
+            List<ShapedCustomExpando> customActions = actions.ToList();
+            List<CustomExpando> shapedActions = actions.Select(a => a.CustomExpando).ToList();
 
-            return Ok(actions);
+            var mediaType = HttpContext.Items["AcceptHeaderMediaType"] as MediaTypeHeaderValue
+                            ?? throw new InvalidOperationException("AcceptHeaderMediaType is not set.");
+
+            if (!mediaType.SubTypeWithoutSuffix.EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return Ok(shapedActions);
+            }
+
+            for (int i = 0; i < shapedActions.Count(); i++)
+            {
+                var actionLinks = CreateLinksForAction(customActions[i].Id, actionParameters.Fields);
+                shapedActions[i].Add("Links", actionLinks);
+            }
+
+            var actionsWrapper = new LinkWrapper<CustomExpando>(shapedActions);
+
+            return Ok(CreateLinksForAction(actionsWrapper));
         }
 
         [HttpGet("{actionID}")]
@@ -65,7 +91,7 @@ namespace BloodDonationApp.Presentation.Controllers
         }
 
         [HttpGet("{userType}/{id}")]
-        public async Task<ActionResult<IEnumerable<GetTransfusionActionDTO>>> GetAllActions(UserType userType, string id)
+        public async Task<ActionResult<IEnumerable<GetTransfusionActionDTO>>> GetAllUsersActions(UserType userType, string id)
         {
             switch (userType)
             {
@@ -137,6 +163,42 @@ namespace BloodDonationApp.Presentation.Controllers
                 default:
                     return BadRequest("Invalid userType");
             }
-        }     
+        }
+
+        private IEnumerable<Link> CreateLinksForAction(int id, string fields = "")
+        {
+            var links = new List<Link>
+    {
+        new Link(_linkGenerator.GetUriByAction(HttpContext, action: nameof(GetAction), controller: "Action",  values: new { actionID = id, fields }),
+        "get_action",
+        "GET"),
+
+        //new Link(_linkGenerator.GetUriByAction(HttpContext, action: nameof(FindActionByOfficial), controller: "Action",  values: new {  officialsID = id }),
+        //"get_officials_actions",
+        //"GET"),
+
+        //new Link(_linkGenerator.GetUriByAction(HttpContext, action: nameof(GetAllUsersActions), controller: "Action", values: new { userType = UserType.Volunteer, id }),
+        //"get_users_actions",
+        //"GET"),
+
+        //new Link(_linkGenerator.GetUriByAction(HttpContext, action: nameof(GetCurrentActions), controller: "Action", values: new { userType = UserType.Volunteer, id }),
+        //"get_current_actions",
+        //"GET")
+    };
+
+            return links;
+        }
+
+        private LinkWrapper<CustomExpando> CreateLinksForAction(LinkWrapper<CustomExpando> actionsWrapper)
+        {
+            actionsWrapper.Links.Add(new Link(_linkGenerator.GetUriByAction(HttpContext, action: nameof(GetAllActions), controller: "Action", values: new { }),
+                    "self",
+                    "GET"));
+
+            return actionsWrapper;
+        }
+
+
+
     }
 }
