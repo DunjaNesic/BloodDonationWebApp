@@ -1,15 +1,14 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
 using BloodDonationApp.BusinessLogic.Services.Implementation;
 using BloodDonationApp.DataAccessLayer.UnitOfWork;
-using BloodDonationApp.DataTransferObject.Donors; //proveri dal sme
-using BloodDonationApp.DataTransferObject.Mappers; //proveri dal sme
-using BloodDonationApp.Domain.DomainModel; //proveri dal sme
 using BloodDonationApp.Infrastructure;
 using BloodDonationApp.LoggerService;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
+using BloodDonationApp.Domain.DomainModel;
+using Microsoft.AspNetCore.Identity;
 
 namespace BloodDonationApp.API.Extensions
 {
@@ -103,6 +102,21 @@ namespace BloodDonationApp.API.Extensions
                         .WriteAsync("Too many requests. Please try again later.", token);
                 };
             });
+        }
+
+        public static void ConfigureIdentity(this IServiceCollection services)
+        {
+            var builder = services.AddIdentity<User, IdentityRole>(o =>
+            {
+                o.Password.RequireDigit = true;
+                o.Password.RequireLowercase = false;
+                o.Password.RequireUppercase = false;
+                o.Password.RequireNonAlphanumeric = false;
+                o.Password.RequiredLength = 10;
+                o.User.RequireUniqueEmail = true;
+            })
+            .AddEntityFrameworkStores<BloodDonationContext>()
+            .AddDefaultTokenProviders();
         }
 
     }

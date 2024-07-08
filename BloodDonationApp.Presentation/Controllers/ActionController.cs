@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Net.Http.Headers;
 using System.Dynamic;
 using System.Linq.Expressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BloodDonationApp.Presentation.Controllers
 {

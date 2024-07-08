@@ -18,10 +18,11 @@ namespace BloodDonationApp.DataAccessLayer.QuestionnaireRepo
         public QuestionnaireRepository(BloodDonationContext context) : base(context) {
             _context = context;
         }
-        public async Task CreateQuestionnaireForDonor(string JMBG, Questionnaire questionnaire)
+        public async Task CreateQuestionnaireForDonor(string JMBG, int actionID, Questionnaire questionnaire)
         {
             questionnaire.JMBG = JMBG;
-            await _context.Questionnaires.AddAsync(questionnaire);
+            questionnaire.ActionID = actionID;
+            await CreateAsync(questionnaire);
         }
 
         public async Task<IEnumerable<Questionnaire>> GetAllForDonorAsync(string JMBG, QuestionnaireParameters questionnaireParameters, bool trackChanges)

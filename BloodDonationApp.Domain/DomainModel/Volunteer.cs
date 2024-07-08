@@ -13,14 +13,14 @@ namespace BloodDonationApp.Domain.DomainModel
         Musko = 0,
         Zensko = 1
     }
-    public class Volunteer
+    public class Volunteer 
     {
         [Key]
         public int VolunteerID { get; set; }
         public string VolunteerFullName { get; set; } = string.Empty;
         public string VolunteerEmailAddress { get; set; } = string.Empty;
-        public required string Username { get; set; } 
-        public required string Password { get; set; } 
+        //public required string Username { get; set; } 
+        //public required string Password { get; set; } 
         public Sex Sex { get; set; }
         public DateTime DateFreeFrom { get; set; }
         public DateTime DateFreeTo { get; set; }

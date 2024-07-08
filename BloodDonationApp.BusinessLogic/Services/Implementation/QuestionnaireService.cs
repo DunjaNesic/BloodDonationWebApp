@@ -5,6 +5,7 @@ using BloodDonationApp.DataTransferObject.Mappers;
 using BloodDonationApp.DataTransferObject.Questionnaires;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
+using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Action;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Donor;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
@@ -40,13 +41,23 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             var questionnairesDTO = questionnaires.Select(q => _mapper.ToDto(q)).ToList();
             return new ApiOkResponse<IEnumerable<GetQuestionnaireDTO>>(questionnairesDTO);
         }
-        public async Task<ApiBaseResponse> Create(string JMBG, Questionnaire questionnaire)
+        public async Task<ApiBaseResponse> Create(string JMBG, int actionID, CreateQuestionnaireDTO questionnaireDTO)
         {
-            var donor = uow.DonorRepository.GetByJMBG(JMBG);
+            var donor = await uow.DonorRepository.GetByJMBG(JMBG);
             if (donor == null) return new DonorNotFoundResponse();
-            await uow.QuestionnaireRepository.CreateQuestionnaireForDonor(JMBG, questionnaire);
+            var action = await uow.ActionRepository.GetAction(actionID);
+            if (action == null) return new ActionNotFoundResponse();
+
+            var questions = uow.QuestionRepository.GetAll(false).ToList();
+
+            var questionnaire = _mapper.FromDto(questionnaireDTO, questions);
+
+            await uow.QuestionnaireRepository.CreateQuestionnaireForDonor(JMBG, actionID, questionnaire);
             await uow.SaveChanges();
-            return new ApiOkResponse<Questionnaire>(questionnaire);
+
+            var questionnaireToReturn = _mapper.ToDto(questionnaire);
+
+            return new ApiOkResponse<GetQuestionnaireDTO>(questionnaireToReturn);
         }
 
 

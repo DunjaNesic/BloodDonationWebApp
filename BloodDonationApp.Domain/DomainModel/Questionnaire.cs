@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BloodDonationApp.Domain.DomainModel
 {
+    [DataContract(IsReference = true)]
     public class Questionnaire
     {
         public required string JMBG { get; set; }
@@ -18,8 +20,8 @@ namespace BloodDonationApp.Domain.DomainModel
         public bool Approved { get; set; }
         public string? Remark { get; set; }
         public DateTime DateOfMaking { get; set; }
-        public List<Question> Questions { get; set; } = new List<Question>();
-        public List<QuestionnaireQuestion> ListOfQuestions { get; set; } = new List<QuestionnaireQuestion>();
+        public List<Question>? Questions { get; set; }
+        public List<QuestionnaireQuestion>? ListOfQuestions { get; set; }
         public string? QRCode { get; set; }
         public byte[] RowVersion { get; set; } = Array.Empty<byte>();
     }

@@ -12,7 +12,7 @@ namespace BloodDonationApp.DataTransferObject.Questionnaires
     {
         public string? QuestionnaireTitle { get; set; }
         public string? Remark { get; set; }
-        //public List<QuestionnaireQuestion> ListOfQuestions { get; set; } = new List<QuestionnaireQuestion>();
+        public List<QuestionnaireQuestion>? AnsweredQuestions { get; set; }
 
     }
 }

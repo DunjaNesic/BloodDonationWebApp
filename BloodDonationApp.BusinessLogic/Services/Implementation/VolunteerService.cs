@@ -59,6 +59,8 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             //    }
             //    return new VolunteerUnprocessableEntityResponse();
             //}
+
+            //sredi ovo, CreateAsync je iz base repozitorija
             await uow.VolunteerRepository.CreateAsync(v);
             await uow.SaveChanges();
             return new ApiOkResponse<Volunteer>(v);

@@ -19,11 +19,11 @@ namespace BloodDonationApp.Domain.DomainModel
         OPozitivna,
         ONegativna
     }
-    public class Donor
+    public class Donor 
     {
         [Key]
         public required string JMBG { get; set; }
-        public required string Password { get; set; }
+        //public required string Password { get; set; }
         public required string DonorFullName { get; set; }
         public required string DonorEmailAddress { get; set; }
         public Sex Sex { get; set; }

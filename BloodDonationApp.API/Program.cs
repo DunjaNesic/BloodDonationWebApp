@@ -42,6 +42,8 @@ builder.Services.ConfigureServiceManager();
 //builder.Services.ConfigureResponseCaching();
 builder.Services.ConfigureOutputCaching();
 builder.Services.ConfigureRateLimitingOptions();
+builder.Services.AddAuthentication();
+builder.Services.ConfigureIdentity();
 
 builder.Services.AddControllers(config =>
 {
@@ -97,7 +99,6 @@ app.UseCors("CorsPolicy");
 app.UseOutputCache();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();

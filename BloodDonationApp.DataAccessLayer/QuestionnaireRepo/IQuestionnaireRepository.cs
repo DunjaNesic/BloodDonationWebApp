@@ -13,6 +13,6 @@ namespace BloodDonationApp.DataAccessLayer.QuestionnaireRepo
     public interface IQuestionnaireRepository
     {
         Task<IEnumerable<Questionnaire>> GetAllForDonorAsync(string JMBG, QuestionnaireParameters questionnaireParameters, bool trackChanges);
-        Task CreateQuestionnaireForDonor(string JMBG, Questionnaire questionnaire);
+        Task CreateQuestionnaireForDonor(string JMBG, int actionID, Questionnaire questionnaire);
     }
 }

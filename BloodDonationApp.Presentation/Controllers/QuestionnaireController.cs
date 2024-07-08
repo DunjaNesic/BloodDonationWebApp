@@ -37,22 +37,15 @@ namespace BloodDonationApp.Presentation.Controllers
             return Ok(questionnaires);
         }
 
-        //[HttpPost]
-        ////[ServiceFilter(typeof(ValidationFilterAttribute))]
-        //public async Task<IActionResult> Create([FromBody] CreateQuestionnaireDTO questionnaire, string JMBG)
-        //{
-        //    try
-        //    {
-        //        var questions = await _serviceManager.QuestionService.GetAll(false);
-        //        var createdQuestionnaire = QuestionnaireMapper.FromDto(questionnaire, questions);
-        //        await _serviceManager.QuestionnaireService.Create(JMBG, createdQuestionnaire);
-        //        return Ok(new { Message = "Questionnaire added successfully" });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { Message = ex.Message });
-        //    }
-        //}
+        [HttpPost("{actionID}")]
+        //[ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<ActionResult<GetQuestionnaireDTO>> Create([FromBody] CreateQuestionnaireDTO createdQuestionnaire, string JMBG, int actionID)
+        {
+             var baseResult = await _serviceManager.QuestionnaireService.Create(JMBG, actionID, createdQuestionnaire);
+             if (!baseResult.Success) return ProcessError(baseResult);
+             var questionnaires = baseResult.GetResult<GetQuestionnaireDTO>();
+             return Ok(questionnaires);            
+        }
 
     }
 }

@@ -1,5 +1,4 @@
-﻿using BloodDonationApp.DataTransferObject.QuestionnaireQuestions;
-using BloodDonationApp.Domain.DomainModel;
+﻿using BloodDonationApp.Domain.DomainModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +14,7 @@ namespace BloodDonationApp.DataTransferObject.Questionnaires
         public int ActionID { get; set; }
         public string? QuestionnaireTitle { get; set; }
         public string? Remark { get; set; }
-        public DateTime DateOfMaking { get; set; }
-        public List<CreateQuestionnaireQuestionDTO> ListOfQuestions { get; set; } = new List<CreateQuestionnaireQuestionDTO>();
+        public DateTime DateOfMaking { get; set; } = DateTime.UtcNow;
+        public List<bool> Answers { get; set; } = new List<bool>();
     }
 }
