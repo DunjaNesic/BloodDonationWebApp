@@ -18,7 +18,7 @@ namespace BloodDonationApp.DataTransferObject.Donors
         public string PlaceName { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public DateTime LastDonationDate { get; set; }
-        public List<GetCallsToDonor>? CallsToDonate { get; set; }
+        public List<CallsToDonorDTO>? CallsToDonate { get; set; }
 
 
     }

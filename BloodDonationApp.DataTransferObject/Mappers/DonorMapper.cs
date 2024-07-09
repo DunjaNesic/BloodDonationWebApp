@@ -20,7 +20,7 @@ namespace BloodDonationApp.DataTransferObject.Mappers
             BloodType = donor.BloodType,
             IsActive = donor.IsActive,
             LastDonationDate = donor.LastDonationDate,
-            CallsToDonate = donor.CallsToDonate?.Select(call => new GetCallsToDonor{
+            CallsToDonate = donor.CallsToDonate?.Select(call => new CallsToDonorDTO{
                 AcceptedTheCall = call.AcceptedTheCall,
                 ShowedUp = call.ShowedUp
             }).ToList()

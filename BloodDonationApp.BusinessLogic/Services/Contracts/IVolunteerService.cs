@@ -1,4 +1,5 @@
-﻿using BloodDonationApp.Domain.DomainModel;
+﻿using BloodDonationApp.DataTransferObject.Volunteers;
+using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using Common.RequestFeatures;
 using System;
@@ -15,10 +16,9 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
         Task<ApiBaseResponse> GetAll(bool trackChanges, VolunteerParameters volunteerParameters);
         Task<ApiBaseResponse> GetByCondition(Expression<Func<Volunteer, bool>> condition, bool trackChanges);
         Task<ApiBaseResponse> GetVolunteer(int volunteerID);
-        Task<ApiBaseResponse> Create(Volunteer v);
-        Task Update(Volunteer v, int volunteerID);
-        Task<ApiBaseResponse> Delete(int volunteerID);
         Task<ApiBaseResponse> GetVolunteersActions(int volunteerID);
         Task<ApiBaseResponse> GetIncomingVolunteerAction(int volunteerID);
+        Task<ApiBaseResponse> CallVolunteer(int volunteerID, int actionID);
+        Task<ApiBaseResponse> UpdateCallToVolunteer(int volunteerID, int actionID, CallsToVolunteerDTO volunteerCall);
     }
 }

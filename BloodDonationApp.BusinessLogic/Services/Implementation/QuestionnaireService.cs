@@ -83,6 +83,10 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             questionnaire.ListOfQuestions = questionnaire.ListOfQuestions
                                         .Concat(changedQuestionnaire.ListOfQuestions)
                                         .ToList();
+            if (questionnaire.RowVersion.SequenceEqual(changedQuestionnaire.RowVersion) == false)
+            {
+                throw new Exception("Radite sa zastarelim podacima o upitniku");
+            }
 
             await uow.SaveChanges();
 

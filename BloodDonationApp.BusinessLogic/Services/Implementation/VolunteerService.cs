@@ -14,6 +14,8 @@ using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Volunteer;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
 using Common.RequestFeatures;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
@@ -33,48 +35,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             _logger = logger;
 
         }
-        //    public async Task<ApiBaseResponse> GetAll(bool trackChanges)
-        //{        
-        //    //var volunteers = await uow.VolunteerRepository.GetAllAsync(trackChanges);
-        //    //return new ApiOkResponse<IQueryable<Volunteer>>(volunteers);
-        //}
-
-        //public async Task<ApiBaseResponse> GetByCondition(Expression<Func<Volunteer, bool>> condition, bool trackChanges)
-        //{
-        //    //var filteredVolunteers = await uow.VolunteerRepository.GetByConditionAsync(condition, trackChanges);
-        //    //if (filteredVolunteers.IsNullOrEmpty()) return new VolunteerNotFoundResponse();
-        //    //return new ApiOkResponse<IQueryable<Volunteer>>(filteredVolunteers);
-        //}
-
-        public async Task<ApiBaseResponse> Create(Volunteer v)
-        {
-            //VolunteerValidation validator = new();
-            //var errorMessages = validator.Validate(v);
-
-            //if (errorMessages.Count != 0)
-            //{
-            //    foreach (var message in errorMessages)
-            //    {
-            //        Console.WriteLine(message);
-            //    }
-            //    return new VolunteerUnprocessableEntityResponse();
-            //}
-
-            //sredi ovo, CreateAsync je iz base repozitorija
-            await uow.VolunteerRepository.CreateAsync(v);
-            await uow.SaveChanges();
-            return new ApiOkResponse<Volunteer>(v);
-        }
-        public async Task<ApiBaseResponse> Delete(int volunteerID)
-        {
-            Expression<Func<Volunteer, bool>> condition = vol => vol.VolunteerID == volunteerID;
-            var volunteerToDelete = await uow.VolunteerRepository.GetVolunteer(condition, true);
-            if (volunteerToDelete == null) return new VolunteerNotFoundResponse();
-            uow.VolunteerRepository.Delete(volunteerToDelete);
-            await uow.SaveChanges();
-            return new ApiOkResponse<string>("Volunteer deleted successfully");
-        }
-
         public async Task<ApiBaseResponse> GetAll(bool trackChanges, VolunteerParameters volunteerParameters)
         {
             _logger.LogInformation("GetAll from VolunteerService");
@@ -104,31 +64,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             return new ApiOkResponse<IEnumerable<GetVolunteerDTO>>(foundVolunteersDTO);
         }
 
-        public async Task Update(Volunteer v, int volunteerID)
-        {
-            Expression<Func<Volunteer, bool>> condition = vol => vol.VolunteerID == volunteerID;
-            var existingVolunteer = await uow.VolunteerRepository.GetVolunteer(condition, true);
-
-            if (existingVolunteer == null)
-                return;
-
-            //if (existingVolunteer.RowVersion.SequenceEqual(v.RowVersion) == false)
-            //{
-            //    throw new Exception("Radite sa zastarelim podacima o volonteru");
-            //}
-
-            //existingVolunteer.RowVersion = v.RowVersion;
-            existingVolunteer.VolunteerFullName = v.VolunteerFullName;
-            existingVolunteer.VolunteerEmailAddress = v.VolunteerEmailAddress;
-            existingVolunteer.RedCrossID = v.RedCrossID;
-            existingVolunteer.DateFreeFrom = v.DateFreeFrom;
-            existingVolunteer.DateFreeTo = v.DateFreeTo;
-            existingVolunteer.DateOfBirth = v.DateOfBirth;
-
-            //await uow.VolunteerRepository.UpdateAsync(v);
-            await uow.SaveChanges();
-        }
-
         public async Task<ApiBaseResponse> GetVolunteersActions(int volunteerID)
         {
             var actions = await uow.VolunteerRepository.GetActions(volunteerID);
@@ -151,6 +86,38 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             }
             var actionsDTO = actions.Select(a => _actionMapper.ToDto(a)).ToList();
             return new ApiOkResponse<IEnumerable<GetTransfusionActionDTO>>(actionsDTO);
+        }
+
+        public async Task<ApiBaseResponse> CallVolunteer(int volunteerID, int actionID)
+        {
+            var volunteer = await uow.VolunteerRepository.GetVolunteer(vol => vol.VolunteerID == volunteerID, false);
+            if (volunteer == null) return new VolunteerNotFoundResponse();
+            
+            var action = await uow.ActionRepository.GetAction(actionID);
+            if (action == null) return new ActionNotFoundResponse();
+
+            bool accepted = true;
+            await uow.VolunteerCallsRepository.CreateCall(volunteerID, actionID, accepted);
+            await uow.SaveChanges();
+            return new ApiOkResponse<string>("woo");
+        }
+
+        public async Task<ApiBaseResponse> UpdateCallToVolunteer(int volunteerID, int actionID, CallsToVolunteerDTO volunteerCall)
+        {
+            var volunteer = await uow.VolunteerRepository.GetVolunteer(v => v.VolunteerID == volunteerID, false);
+            if (volunteer == null) return new VolunteerNotFoundResponse();
+
+            var action = await uow.ActionRepository.GetAction(actionID);
+            if (action == null) return new ActionNotFoundResponse();
+
+            var call = await uow.VolunteerCallsRepository.GetCall(volunteerID, actionID, true);
+            if (call == null) return new VolunteerNotFoundResponse();
+
+            call.AcceptedTheCall = volunteerCall.AcceptedTheCall;
+            call.ShowedUp = volunteerCall.ShowedUp;
+
+            await uow.SaveChanges();
+            return new ApiOkResponse<string>("wooo");
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using BloodDonationApp.DataAccessLayer.ActionRepo;
+using BloodDonationApp.DataAccessLayer.DonorCallsRepo;
 using BloodDonationApp.DataAccessLayer.DonorRepo;
 using BloodDonationApp.DataAccessLayer.PlaceRepo;
 using BloodDonationApp.DataAccessLayer.QuestionnaireRepo;
 using BloodDonationApp.DataAccessLayer.QuestionRepo;
+using BloodDonationApp.DataAccessLayer.VolCallsRepo;
 using BloodDonationApp.DataAccessLayer.VolunteerRepo;
 using BloodDonationApp.Infrastructure;
 using System;
@@ -22,6 +24,8 @@ namespace BloodDonationApp.DataAccessLayer.UnitOfWork
         private readonly Lazy<IQuestionnaireRepository> _questionnaireRepository;
         private readonly Lazy<IQuestionRepository> _questionRepository;
         private readonly Lazy<IVolunteerRepository> _volunteerRepository;
+        private readonly Lazy<IDonorCallsRepository> _donorCallsRepository;
+        private readonly Lazy<IVolCallsRepository> _volunteerCallsRepository;
 
         public UnitOfWork(BloodDonationContext context)
         {
@@ -32,6 +36,8 @@ namespace BloodDonationApp.DataAccessLayer.UnitOfWork
             _questionnaireRepository = new Lazy<IQuestionnaireRepository>(() => new QuestionnaireRepository(_context));
             _questionRepository = new Lazy<IQuestionRepository>(() => new QuestionRepository(_context));
             _volunteerRepository = new Lazy<IVolunteerRepository>(() => new VolunteerRepository(_context));
+            _donorCallsRepository = new Lazy<IDonorCallsRepository>(() => new DonorCallsRepository(_context));
+            _volunteerCallsRepository = new Lazy<IVolCallsRepository>(() => new VolCallsRepository(_context));
         }
 
         public IActionRepository ActionRepository => _actionRepository.Value;
@@ -40,6 +46,9 @@ namespace BloodDonationApp.DataAccessLayer.UnitOfWork
         public IQuestionnaireRepository QuestionnaireRepository => _questionnaireRepository.Value;
         public IQuestionRepository QuestionRepository => _questionRepository.Value;
         public IVolunteerRepository VolunteerRepository => _volunteerRepository.Value;
+        public IDonorCallsRepository DonorCallsRepository => _donorCallsRepository.Value;
+        public IVolCallsRepository VolunteerCallsRepository => _volunteerCallsRepository.Value;
+
         public async Task SaveChanges() => await _context.SaveChangesAsync();
     }
 }

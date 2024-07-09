@@ -37,7 +37,6 @@ namespace BloodDonationApp.Presentation
 
         [HttpGet]
         [Route("{volunteerID}")]
-
         public async Task<ActionResult<GetVolunteerDTO>> GetVolunteer(int volunteerID)
         {
             var baseResult = await _serviceManager.VolunteerService.GetVolunteer(volunteerID);
@@ -48,29 +47,29 @@ namespace BloodDonationApp.Presentation
             return Ok(foundVolunteer);
         }
 
-        //[HttpPost]
-        //[ServiceFilter(typeof(ValidationFilterAttribute))]
-        //public async Task<IActionResult> Create([FromBody] CreateVolunteerDTO volunteer)
-        //{         
-        //    var baseResult = await _serviceManager.VolunteerService.Create(volunteer.FromDto());
-        //    if (!baseResult.Success) return ProcessError(baseResult);
-        //    else return Ok(new { Message = "Volunteer added successfully" });          
-        //}
+        [HttpPost]
+        [Route("{volunteerID}/{actionID}")]
+        public async Task<IActionResult> ActionSignUp([FromRoute]int volunteerID, int actionID)
+        {
+            var baseResult = await _serviceManager.VolunteerService.CallVolunteer(volunteerID, actionID);
+            if (!baseResult.Success) return ProcessError(baseResult);
 
-        //[HttpDelete("{volunteerID}")]
-        //public async Task<IActionResult> Delete(int volunteerID)
-        //{
-        //   var baseResult = await _serviceManager.VolunteerService.Delete(volunteerID);
-        //    if (!baseResult.Success) return ProcessError(baseResult);
-        //    else return Ok(new { Message = "Volunteer deleted successfully" });
-        //}
+            var call = baseResult.GetResult<string>();
 
-        //[HttpPut("{volunteerID}")]
-        ////[ServiceFilter(typeof(ValidationFilterAttribute))]
-        //public async Task Update(int volunteerID, [FromBody] UpdateVolunteerDTO volunteer)
-        //{
-        //    await _serviceManager.VolunteerService.Update(volunteer.FromDto(), volunteerID);
-        //}
+            return Ok(call);
+        }
+
+        [HttpPut]
+        [Route("{volunteerID}/{actionID}")]
+        public async Task<IActionResult> UpdateCall([FromRoute] int volunteerID, int actionID, [FromBody] CallsToVolunteerDTO volunteerCall)
+        {
+            var baseResult = await _serviceManager.VolunteerService.UpdateCallToVolunteer(volunteerID, actionID, volunteerCall);
+            if (!baseResult.Success) return ProcessError(baseResult);
+
+            var call = baseResult.GetResult<string>();
+
+            return Ok(call);
+        }
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
 using BloodDonationApp.DataTransferObject.Donors;
+using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using Common.RequestFeatures;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +40,31 @@ namespace BloodDonationApp.Presentation.Controllers
 
             return Ok(foundDonor);
         }
+
+        [HttpPost]
+        [Route("{JMBG}/{actionID}")]
+        public async Task<IActionResult> ActionSignUp([FromRoute] string JMBG, int actionID)
+        {
+            var baseResult = await _serviceManager.DonorService.CallDonor(JMBG, actionID);
+            if (!baseResult.Success) return ProcessError(baseResult);
+
+            var call = baseResult.GetResult<string>();
+
+            return Ok(call);
+        }
+
+        [HttpPut]
+        [Route("{JMBG}/{actionID}")]
+        public async Task<IActionResult> UpdateCall([FromRoute] string JMBG, int actionID, [FromBody] CallsToDonorDTO donorCall)
+        {
+            var baseResult = await _serviceManager.DonorService.UpdateCallToDonor(JMBG, actionID, donorCall);
+            if (!baseResult.Success) return ProcessError(baseResult);
+
+            var call = baseResult.GetResult<string>();
+
+            return Ok(call);
+        }
+
 
     }
 }

@@ -8,6 +8,7 @@ using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Action;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Donor;
+using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Volunteer;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
 using Common.RequestFeatures;
@@ -66,5 +67,38 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             var actionsDTO = actions.Select(a => _actionMapper.ToDto(a)).ToList();
             return new ApiOkResponse<IEnumerable<GetTransfusionActionDTO>>(actionsDTO);
         }
+
+        public async Task<ApiBaseResponse> CallDonor(string JMBG, int actionID)
+        {
+            var donor = await uow.DonorRepository.GetByJMBG(JMBG);
+            if (donor == null) return new DonorNotFoundResponse();
+
+            var action = await uow.ActionRepository.GetAction(actionID);
+            if (action == null) return new ActionNotFoundResponse();
+
+            bool accepted = true;
+            await uow.DonorCallsRepository.CreateCall(JMBG, actionID, accepted);
+            await uow.SaveChanges();
+            return new ApiOkResponse<string>("woo");
+        }
+
+        public async Task<ApiBaseResponse> UpdateCallToDonor(string JMBG, int actionID, CallsToDonorDTO donorCall)
+        {
+            var donor = await uow.DonorRepository.GetByJMBG(JMBG);
+            if (donor == null) return new DonorNotFoundResponse();
+
+            var action = await uow.ActionRepository.GetAction(actionID);
+            if (action == null) return new ActionNotFoundResponse();
+
+            var call = await uow.DonorCallsRepository.GetCall(JMBG, actionID, true);
+            if (call == null) return new DonorNotFoundResponse();
+
+            call.AcceptedTheCall = donorCall.AcceptedTheCall;
+            call.ShowedUp = donorCall.ShowedUp;
+
+            await uow.SaveChanges();
+            return new ApiOkResponse<string>("wooo");
+        }
+
     }
 }
