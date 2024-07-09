@@ -19,28 +19,9 @@ namespace BloodDonationApp.DataAccessLayer.QuestionRepo
             _context = context;
         }
 
-        //public async Task<IQueryable<Question>> GetAllAsync(bool trackChanges)
-        //{
-        //    IEnumerable<Question> query = await _context.Questions.ToListAsync();
-
-
-        //    IQueryable<Question> result = query.AsQueryable();
-
-        //    result = trackChanges ? result : result.AsNoTracking();
-
-        //    return result;
-        //}
-
-        //IQueryable<Question> GetAll(bool trackChanges)
-        //{
-        //     IEnumerable<Question> query = _context.Questions.ToList(); 
-
-        //     IQueryable<Question> result = query.AsQueryable();
-
-        //     result = trackChanges ? result : result.AsNoTracking();
-
-        //     return result;
-        //}
-
+        public async Task<IEnumerable<Question>> GetQuestionsByConditionAsync(Expression<Func<Question, bool>> condition, bool trackChanges)
+        {
+            return await GetByCondition(condition, trackChanges).ToListAsync();
+        }
     }
 }

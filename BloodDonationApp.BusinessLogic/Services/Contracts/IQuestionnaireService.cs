@@ -14,5 +14,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
     {
         Task<ApiBaseResponse> GetAll(string JMBG, QuestionnaireParameters questionnaireParameters, bool trackChanges);
         Task<ApiBaseResponse> Create(string JMBG, int actionID, CreateQuestionnaireDTO questionnaireDTO);
+        Task<ApiBaseResponse> Update(string JMBG, int actionID, UpdateQuestionnaireDTO questionnaireDTO);
     }
 }

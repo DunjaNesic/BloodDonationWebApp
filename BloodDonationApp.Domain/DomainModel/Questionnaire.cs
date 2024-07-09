@@ -12,7 +12,7 @@ namespace BloodDonationApp.Domain.DomainModel
     [DataContract(IsReference = true)]
     public class Questionnaire
     {
-        public required string JMBG { get; set; }
+        public string JMBG { get; set; }
         public Donor Donor { get; set; } = null!;
         public int ActionID { get; set; }
         public TransfusionAction Action { get; set; } = null!;

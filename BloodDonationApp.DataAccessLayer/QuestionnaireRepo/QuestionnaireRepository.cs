@@ -40,6 +40,18 @@ namespace BloodDonationApp.DataAccessLayer.QuestionnaireRepo
 
             return await query.ToListAsync();
         }
-  
+
+        public async Task<Questionnaire> GetQuestionnaire(string JMBG, int actionID, bool trackChanges)
+        {
+
+            var includes = new Expression<Func<Questionnaire, object>>[]
+            {
+                  q => q.ListOfQuestions
+            };
+
+            var questionnaire = await GetByCondition(q => q.JMBG.Equals(JMBG) && q.ActionID == actionID, trackChanges, includes).FirstOrDefaultAsync();
+            return questionnaire;
+        }
+
     }
 }

@@ -189,7 +189,17 @@ namespace BloodDonationApp.Infrastructure
                 new Question { QuestionID = 18, QuestionText = "Da li ste ikada koristili bilo koju vrstu droge?" },
                 new Question { QuestionID = 19, QuestionText = "Da li ste ikada koristili preparate koji se zvanično ne izdaju na recept i/ili preparate za bodi bilding (steroide)?" },
                 new Question { QuestionID = 20, QuestionText = "Da li znate na koje sve načine ste mogli izložiti sebe riziku od zaraznih, krvlju prenosivih bolesti?" },
-                new Question { QuestionID = 21, QuestionText = "Da li ste u proteklih 6 meseci imali neku operaciju ili primili krv?" }
+                new Question { QuestionID = 21, QuestionText = "Da li ste u proteklih 6 meseci imali neku operaciju ili primili krv?" },
+                new Question { QuestionID = 22, QuestionText = "Da li je davalac u dobrom opštem zdravstvenom stanju?", Flag = 1 },
+                new Question { QuestionID = 23, QuestionText = "Da li davalac ima normalne vitalne znakove (krvni pritisak, puls, temperatura)?", Flag = 1 },
+                new Question { QuestionID = 24, QuestionText = "Da li su nalazi krvne slike davaoca u granicama normale?", Flag = 1 },
+                new Question { QuestionID = 25, QuestionText = "Da li je koža davaoca bez osipa, rana ili infekcija?", Flag = 1 },
+                new Question { QuestionID = 26, QuestionText = "Da li je srčani ritam davaoca regularan bez znakova aritmije?", Flag = 1 },
+                new Question { QuestionID = 27, QuestionText = "Da li su pluća davaoca čista i bez znakova infekcije ili zagušenja?", Flag = 1 },
+                new Question { QuestionID = 28, QuestionText = "Da li davalac ima normalan nivo hemoglobina?", Flag = 1 },
+                new Question { QuestionID = 29, QuestionText = "Da li davalac pokazuje znake anemije ili drugih krvnih poremećaja?", Flag = 1 },
+                new Question { QuestionID = 30, QuestionText = "Da li je rezultat testa za HIV, hepatitis B, hepatitis C i sifilis negativan?", Flag = 1 },
+                new Question { QuestionID = 31, QuestionText = "Da li davalac ima adekvatan nivo hidratacije i nije dehidriran?", Flag = 1 }
                 );
             modelBuilder.Entity<CallToDonate>().HasData(
                 new CallToDonate { JMBG = "0101995700001", ActionID = 1, AcceptedTheCall = true, ShowedUp = true },

@@ -7,6 +7,7 @@ using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Action;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Donor;
+using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Questionnaire;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
 using Common.RequestFeatures;
@@ -48,7 +49,8 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             var action = await uow.ActionRepository.GetAction(actionID);
             if (action == null) return new ActionNotFoundResponse();
 
-            var questions = uow.QuestionRepository.GetAll(false).ToList();
+            Expression<Func<Question, bool>> condition = question => question.Flag == 0;
+            var questions = await uow.QuestionRepository.GetQuestionsByConditionAsync(condition, false);
 
             var questionnaire = _mapper.FromDto(questionnaireDTO, questions);
 
@@ -60,6 +62,33 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             return new ApiOkResponse<GetQuestionnaireDTO>(questionnaireToReturn);
         }
 
+        public async Task<ApiBaseResponse> Update(string JMBG, int actionID, UpdateQuestionnaireDTO questionnaireDTO)
+        {
+            var donor = await uow.DonorRepository.GetByJMBG(JMBG);
+            if (donor == null) return new DonorNotFoundResponse();
+            var action = await uow.ActionRepository.GetAction(actionID);
+            if (action == null) return new ActionNotFoundResponse();
 
+            Expression<Func<Question, bool>> condition = question => question.Flag == 1;
+            var questions = await uow.QuestionRepository.GetQuestionsByConditionAsync(condition, true);
+
+            var questionnaire = await uow.QuestionnaireRepository.GetQuestionnaire(JMBG, actionID, true);
+            if (questionnaire == null) return new QuestionnareNotFoundResponse();
+            
+            var changedQuestionnaire = _mapper.FromDto(questionnaireDTO, questions);
+            questionnaire.Remark = changedQuestionnaire.Remark;
+            questionnaire.Approved = changedQuestionnaire.Approved;
+            questionnaire.QRCode = changedQuestionnaire.QRCode;
+            questionnaire.RowVersion = changedQuestionnaire.RowVersion;
+            questionnaire.ListOfQuestions = questionnaire.ListOfQuestions
+                                        .Concat(changedQuestionnaire.ListOfQuestions)
+                                        .ToList();
+
+            await uow.SaveChanges();
+
+            var questionnaireToReturn = _mapper.ToDto(questionnaire);
+
+            return new ApiOkResponse<GetQuestionnaireDTO>(questionnaireToReturn);
+        }
     }
 }

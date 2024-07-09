@@ -32,8 +32,12 @@ namespace BloodDonationApp.Presentation.Controllers
             [FromQuery] QuestionnaireParameters questionnaireParameters)
         {
             var baseResult = await _serviceManager.QuestionnaireService.GetAll(JMBG, questionnaireParameters, trackChanges: false);
-            if (!baseResult.Success) return ProcessError(baseResult);
+         
+            if (!baseResult.Success)
+                return ProcessError(baseResult);
+
             var questionnaires = baseResult.GetResult<IEnumerable<GetQuestionnaireDTO>>();
+
             return Ok(questionnaires);
         }
 
@@ -42,10 +46,34 @@ namespace BloodDonationApp.Presentation.Controllers
         public async Task<ActionResult<GetQuestionnaireDTO>> Create([FromBody] CreateQuestionnaireDTO createdQuestionnaire, string JMBG, int actionID)
         {
              var baseResult = await _serviceManager.QuestionnaireService.Create(JMBG, actionID, createdQuestionnaire);
-             if (!baseResult.Success) return ProcessError(baseResult);
+             
+             if (!baseResult.Success)
+                return ProcessError(baseResult);
+
              var questionnaires = baseResult.GetResult<GetQuestionnaireDTO>();
+
              return Ok(questionnaires);            
         }
 
+        [HttpPut("{actionID}")]
+        public async Task<ActionResult<GetQuestionnaireDTO>> Update([FromBody] UpdateQuestionnaireDTO updatedQuestionnaire, string JMBG, int actionID)
+        {
+            if (!ModelState.IsValid)
+            {
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"Validation error: {error.ErrorMessage}");
+                }
+                return BadRequest(ModelState); 
+            }
+            var baseResult = await _serviceManager.QuestionnaireService.Update(JMBG, actionID, updatedQuestionnaire);
+
+            if (!baseResult.Success)
+                return ProcessError(baseResult);
+
+            var updatedQuestionnaireDto = baseResult.GetResult<GetQuestionnaireDTO>();
+
+            return Ok(updatedQuestionnaireDto);
+        }
     }
 }
