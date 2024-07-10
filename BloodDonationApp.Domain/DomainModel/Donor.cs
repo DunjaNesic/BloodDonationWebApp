@@ -23,9 +23,9 @@ namespace BloodDonationApp.Domain.DomainModel
     {
         [Key]
         public required string JMBG { get; set; }
-        //public required string Password { get; set; }
         public required string DonorFullName { get; set; }
-        public required string DonorEmailAddress { get; set; }
+        public int UserID { get; set; }
+        public User User { get; set; }
         public Sex Sex { get; set; }
         public BloodType BloodType { get; set; }
         public bool IsActive { get; set; }

@@ -18,9 +18,8 @@ namespace BloodDonationApp.Domain.DomainModel
         [Key]
         public int VolunteerID { get; set; }
         public string VolunteerFullName { get; set; } = string.Empty;
-        public string VolunteerEmailAddress { get; set; } = string.Empty;
-        //public required string Username { get; set; } 
-        //public required string Password { get; set; } 
+        public int UserID { get; set; }
+        public User User { get; set; }
         public Sex Sex { get; set; }
         public DateTime DateFreeFrom { get; set; }
         public DateTime DateFreeTo { get; set; }

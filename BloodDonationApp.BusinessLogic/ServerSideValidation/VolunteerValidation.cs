@@ -20,7 +20,6 @@ namespace BloodDonationApp.BusinessLogic.ServerSideValidation
             var errorMessages = new List<string>();
 
             errorMessages.AddRange(ValidateField(volunteer.VolunteerFullName, "Ime i prezime volontera", ValidateVolunteerFullName));
-            errorMessages.AddRange(ValidateField(volunteer.VolunteerEmailAddress, "Email volontera", ValidateVolunteerAddress));
             errorMessages.AddRange(ValidateField(volunteer.DateFreeFrom.ToString(), "Datum od", ValidateDateFreeFrom));
             errorMessages.AddRange(ValidateField(volunteer.DateFreeTo.ToString(), "Datum do", ValidateDateFreeTo));
             errorMessages.AddRange(ValidateField(volunteer.DateOfBirth.ToString(), "Datum rodjenja volontera", ValidateDateOfBirth));

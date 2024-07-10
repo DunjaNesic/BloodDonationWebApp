@@ -8,6 +8,7 @@ using BloodDonationApp.Domain.LinkModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using BloodDonationApp.Presentation.ActionFilters;
 using Common.RequestFeatures;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.RateLimiting;
@@ -40,6 +41,7 @@ namespace BloodDonationApp.Presentation.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Donor")]
         [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         public async Task<ActionResult<IEnumerable<GetTransfusionActionDTO>>> GetAllActions([FromQuery] ActionParameters actionParameters )
         {

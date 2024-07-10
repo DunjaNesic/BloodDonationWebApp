@@ -1,0 +1,169 @@
+﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
+using BloodDonationApp.DataAccessLayer.UnitOfWork;
+using BloodDonationApp.DataTransferObject.Users;
+using BloodDonationApp.Domain.DomainModel;
+using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Volunteer;
+using BloodDonationApp.LoggerService;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BloodDonationApp.BusinessLogic.Services.Implementation
+{
+    public class AuthenticationService : IAuthenticationService
+    {
+        private readonly IUnitOfWork _uow;
+        private readonly ILoggerManager _logger;
+        private readonly IConfiguration _configuration;
+        public User? user { get; set; }
+        public AuthenticationService(IUnitOfWork uow, ILoggerManager logger, IConfiguration configuration)
+        {
+            user = new User();
+            _uow = uow;
+            _logger = logger;
+            _configuration = configuration;     
+        }
+        public Task RegisterUser(User userForRegistration)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> ValidateUser(UserLoginDTO userForLogin)
+        {
+            user = await _uow.UserRepository.FindByEmailAsync(userForLogin.Email);
+
+            var result = (user != null && await _uow.UserRepository.CheckPasswordAsync(user, userForLogin.Password));
+            if (!result)
+                _logger.LogWarning($"{nameof(ValidateUser)}: Authentication failed. Wrong user credentials"); 
+            return result;
+        }
+
+        public async Task<TokenDTO> CreateToken(bool includeExpiry)
+        {
+            var signingCredentials = GetSigningCredentials();
+            var claims = await GetClaims();
+            var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
+
+            var refreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+
+            if (includeExpiry)
+                user.RefreshTokenExpiryTime = DateTime.Now.AddDays(3);
+
+            _uow.UserRepository.Update(user);
+            await _uow.SaveChanges();
+
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+            TokenDTO token = new TokenDTO() {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+            };
+
+            return token;
+        }
+
+        private SigningCredentials GetSigningCredentials()
+        {
+            var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("DUNJAsSECRET"));
+            var secret = new SymmetricSecurityKey(key);
+
+            return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+        }
+
+        private async Task<List<Claim>> GetClaims()
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user?.Email)
+            };
+
+            var roles = await _uow.UserRepository.GetRolesAsync(user.UserID);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            return claims;
+        }
+
+        private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
+        {
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+
+            var tokenOptions = new JwtSecurityToken
+            (
+                issuer: jwtSettings["validIssuer"],
+                audience: jwtSettings["validAudience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["expires"])),
+                signingCredentials: signingCredentials
+            );
+
+            return tokenOptions;
+        }
+
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = true,
+                ValidateIssuer = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("DUNJAsSECRET"))),
+                ValidateLifetime = true,
+                ValidIssuer = jwtSettings["validIssuer"],
+                ValidAudience = jwtSettings["validAudience"]
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken securityToken;
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out
+        securityToken);
+
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+            if (jwtSecurityToken == null ||
+        !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
+                StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+
+            return principal;
+        }
+
+        public async Task<TokenDTO> RefreshToken(TokenDTO tokenDTO)
+        {
+            var principal = GetPrincipalFromExpiredToken(tokenDTO.AccessToken);
+
+            User? targetUser = await _uow.UserRepository.FindByEmailAsync(principal?.Identity?.Name);
+            if (targetUser == null || user?.RefreshToken != tokenDTO.RefreshToken ||
+            targetUser.RefreshTokenExpiryTime <= DateTime.Now)
+                throw new Exception("promenicu ovo posle");
+            user = targetUser;
+            return await CreateToken(false);
+        }
+    }
+ }

@@ -14,5 +14,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
         IQuestionnaireService QuestionnaireService { get; }
         IQuestionService QuestionService { get; }
         IVolunteerService VolunteerService { get; }
+        IAuthenticationService AuthenticationService { get; }
     }
 }

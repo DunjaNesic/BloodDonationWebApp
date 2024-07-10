@@ -1,5 +1,6 @@
-﻿using BloodDonationApp.Domain.DomainModel;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using BCrypt.Net;
+using BloodDonationApp.Domain.DomainModel;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BloodDonationApp.Infrastructure
@@ -20,20 +21,45 @@ namespace BloodDonationApp.Infrastructure
         public DbSet<RedCross> RedCross { get; set; }
         public DbSet<CallToDonate> CallsToDonate { get; set; }
         public DbSet<CallToVolunteer> CallsToVolunteer { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Donor>()
-            .HasKey(d => d.JMBG);
+            modelBuilder.Entity<User>()
+            .HasMany(u => u.Roles)
+            .WithMany(r => r.Users)
+            .UsingEntity(j => j.ToTable("UserRoles"));
 
-            modelBuilder.Entity<Volunteer>()
-            .HasKey(v => v.VolunteerID);
+            modelBuilder.Entity<Role>().HasData(
+            new Role { RoleID = "donor-role", RoleName = "Donor" },
+            new Role { RoleID = "volunteer-role", RoleName = "Volunteer" },
+            new Role { RoleID = "red-cross", RoleName = "RedCrossOfficial" },
+            new Role { RoleID = "itk", RoleName = "MedicalOfficial" },
+            new Role { RoleID = "official", RoleName = "Official" },
+            new Role { RoleID = "in-charge", RoleName = "OfficialInCharge" }
+        );
 
             modelBuilder.Entity<Official>()
-            .HasKey(o => o.OfficialID);
+                .HasOne(o => o.User)
+                .WithOne()
+                .HasForeignKey<Official>(o => o.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Donor>()
+                .HasOne(d => d.User)
+                .WithOne()
+                .HasForeignKey<Donor>(d => d.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Volunteer>()
+                .HasOne(v => v.User)
+                .WithOne()
+                .HasForeignKey<Volunteer>(v => v.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<TransfusionAction>(entity => {
 
@@ -105,8 +131,40 @@ namespace BloodDonationApp.Infrastructure
 
             base.OnModelCreating(modelBuilder);
         }
+
+        private static string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
         private static void Seed(ModelBuilder modelBuilder)
         {
+            var passwordHasher = new PasswordHasher<User>();
+
+            modelBuilder.Entity<User>().HasData(
+                new User { UserID = 1, Email = "mladen.mijailovic@gmail.com", Password = HashPassword("mladen") },
+                new User { UserID = 2, Email = "vladimir.lazarevic@gmail.com", Password = HashPassword("vladimir") },
+                new User { UserID = 3, Email = "sara.djokic@gmail.com", Password = HashPassword("sara") },
+                new User { UserID = 4, Email = "jelena.subotic@gmail.com", Password = HashPassword("jelena") },
+                new User { UserID = 5, Email = "djordje.mirkovic@gmail.com", Password = HashPassword("djordje") },
+                new User { UserID = 6, Email = "sandra.kovacevic@gmail.com", Password = HashPassword("sandra") },
+                new User { UserID = 7, Email = "petar.nikodijevic@gmail.com", Password = HashPassword("petar") },
+                new User { UserID = 8, Email = "stefan.kotlaja@gmail.com", Password = HashPassword("stefan") },
+                new User { UserID = 9, Email = "iva.djokovic@gmail.com", Password = HashPassword("iva") },
+                new User { UserID = 10, Email = "nevena.dukic@gmail.com", Password = HashPassword("nevena") },
+                new User { UserID = 11, Email = "predrag.tanaskovic@gmail.com", Password = HashPassword("pedja") },
+                new User { UserID = 12, Email = "pavle.gasic@gmail.com", Password = HashPassword("pavle") },
+                new User { UserID = 13, Email = "dunja.nesic@gmail.com", Password = HashPassword("dunja") },
+                new User { UserID = 14, Email = "stefan.jovanovic@gmail.com", Password = HashPassword("stefan") },
+                new User { UserID = 15, Email = "veljko.nedeljkovic@gmail.com", Password = HashPassword("veljko") },
+                new User { UserID = 16, Email = "minja.filip@gmail.com", Password = HashPassword("minja") },
+                new User { UserID = 17, Email = "sofija.filip@gmail.com", Password = HashPassword("sofija") },
+                new User { UserID = 18, Email = "vasilije.nesic@gmail.com", Password = HashPassword("vasa") },
+                new User { UserID = 19, Email = "vojin.cvetkovic@gmail.com", Password = HashPassword("vojin") },
+                new User { UserID = 20, Email = "veljko.cvetkovic@gmail.com", Password = HashPassword("vasa") },
+                new User { UserID = 21, Email = "nikola.miletic@gmail.com", Password = HashPassword("nikola") }
+            );
+
+
             modelBuilder.Entity<Place>().HasData(
                 new Place() { PlaceID = 1, PlaceName = "Smederevo" },
                 new Place() { PlaceID = 2, PlaceName = "Beograd" },
@@ -123,14 +181,14 @@ namespace BloodDonationApp.Infrastructure
                 new Place() { PlaceID = 13, PlaceName = "Kragujevac" });          
 
             modelBuilder.Entity<Donor>().HasData(
-                new Donor() { JMBG = "0101995700001",  DonorFullName = "Mladen Mijailovic", DonorEmailAddress = "mijailovicmladen5@gmail.com", BloodType = BloodType.OPozitivna, IsActive = true, LastDonationDate = new DateTime(2024, 1, 13), PlaceID = 12, Sex = Sex.Musko },
-                new Donor() { JMBG = "1104345940234",  DonorFullName = "Vladimir Lazarevic", DonorEmailAddress = "vladimir.lazarevic@fonis.rs", BloodType = BloodType.ABPozitivna, IsActive = true, LastDonationDate = new DateTime(2024, 1, 1), PlaceID = 4, Sex = Sex.Musko },
-                new Donor() { JMBG = "0303995900003",  DonorFullName = "Sara Djokic", DonorEmailAddress = "sara.jana.djokic@gmail.com", BloodType = BloodType.ABNegativna, IsActive = true, LastDonationDate = new DateTime(2023, 11, 11), PlaceID = 1, Sex = Sex.Zensko },
-                new Donor() { JMBG = "0407945940004",  DonorFullName = "Nemanja Markovic", DonorEmailAddress = "markovicc26@gmail.com", BloodType = BloodType.BPozitivna, IsActive = false, LastDonationDate = new DateTime(2023, 5, 4), PlaceID = 2, Sex = Sex.Musko },
-                new Donor() { JMBG = "1604345940234",  DonorFullName = "Djordje Mirkovic", DonorEmailAddress = "djordjemirkovic001@gmail.com", BloodType = BloodType.ANegativna, IsActive = true, LastDonationDate = new DateTime(2023, 4, 11), PlaceID = 2, Sex = Sex.Musko },
-                new Donor() { JMBG = "1104001765020",  DonorFullName = "Sandra Kovacevic", DonorEmailAddress = "saki@gmail.com", BloodType = BloodType.ANegativna, IsActive = true, LastDonationDate = new DateTime(2022, 4, 11), PlaceID = 6, Sex = Sex.Zensko },
-                new Donor() { JMBG = "1107001543432",  DonorFullName = "Petar Nikodijevic", DonorEmailAddress = "pera@gmail.com", BloodType = BloodType.ANegativna, IsActive = true, LastDonationDate = new DateTime(2023, 4, 11), PlaceID = 1, Sex = Sex.Musko },
-                new Donor() { JMBG = "1505001498898",  DonorFullName = "Stefan Kotlaja", DonorEmailAddress = "kotlajic@gmail.com", BloodType = BloodType.OPozitivna, IsActive = true, LastDonationDate = new DateTime(2024, 1, 1), PlaceID = 11, Sex = Sex.Musko }
+                new Donor() { JMBG = "0101995700001",  DonorFullName = "Mladen Mijailovic", BloodType = BloodType.OPozitivna, IsActive = true, LastDonationDate = new DateTime(2024, 1, 13), PlaceID = 12, Sex = Sex.Musko, UserID = 1 },
+                new Donor() { JMBG = "1104345940234",  DonorFullName = "Vladimir Lazarevic", BloodType = BloodType.ABPozitivna, IsActive = true, LastDonationDate = new DateTime(2024, 1, 1), PlaceID = 4, Sex = Sex.Musko, UserID = 2 },
+                new Donor() { JMBG = "0303995900003",  DonorFullName = "Sara Djokic", BloodType = BloodType.ABNegativna, IsActive = true, LastDonationDate = new DateTime(2023, 11, 11), PlaceID = 1, Sex = Sex.Zensko, UserID = 3 },
+                new Donor() { JMBG = "0407945940004",  DonorFullName = "Jelena Subotic", BloodType = BloodType.BPozitivna, IsActive = false, LastDonationDate = new DateTime(2023, 5, 4), PlaceID = 2, Sex = Sex.Zensko, UserID = 4 },
+                new Donor() { JMBG = "1604345940234",  DonorFullName = "Djordje Mirkovic", BloodType = BloodType.ANegativna, IsActive = true, LastDonationDate = new DateTime(2023, 4, 11), PlaceID = 2, Sex = Sex.Musko, UserID = 5 },
+                new Donor() { JMBG = "1104001765020",  DonorFullName = "Sandra Kovacevic", BloodType = BloodType.ANegativna, IsActive = true, LastDonationDate = new DateTime(2022, 4, 11), PlaceID = 6, Sex = Sex.Zensko, UserID = 6 },
+                new Donor() { JMBG = "1107001543432",  DonorFullName = "Petar Nikodijevic", BloodType = BloodType.ANegativna, IsActive = true, LastDonationDate = new DateTime(2023, 4, 11), PlaceID = 1, Sex = Sex.Musko, UserID = 7 },
+                new Donor() { JMBG = "1505001498898",  DonorFullName = "Stefan Kotlaja", BloodType = BloodType.OPozitivna, IsActive = true, LastDonationDate = new DateTime(2024, 1, 1), PlaceID = 11, Sex = Sex.Musko, UserID = 8 }
                 );
 
             modelBuilder.Entity<RedCross>().HasData(
@@ -141,19 +199,22 @@ namespace BloodDonationApp.Infrastructure
                 );
 
             modelBuilder.Entity<Official>().HasData(
-                new Official() { OfficialID = 1, OfficialFullName = "Dunja Nesic"},
-                new Official() { OfficialID = 2, OfficialFullName = "Stefan Jovanovic" },
-                new Official() { OfficialID = 3, OfficialFullName = "Pavle Gasic" }
+                new Official() { OfficialID = 1, OfficialFullName = "Dunja Nesic", UserID = 13},
+                new Official() { OfficialID = 2, OfficialFullName = "Stefan Jovanovic", UserID = 14 },
+                new Official() { OfficialID = 3, OfficialFullName = "Pavle Gasic", UserID = 12 }
                 );
 
             modelBuilder.Entity<Volunteer>().HasData(
-                new Volunteer { VolunteerID = 1,  VolunteerFullName = "Iva Djokovic", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 10, 22), DateFreeTo = new DateTime(2024, 11, 10), DateOfBirth = new DateTime(2001, 4, 29), RedCrossID = 2, VolunteerEmailAddress = "iva.djokovic@fonis.rs" },
-                new Volunteer { VolunteerID = 2,  VolunteerFullName = "Nevena Dukic", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 5, 1), DateFreeTo = new DateTime(2024, 7, 11), DateOfBirth = new DateTime(2001, 7, 15), RedCrossID = 2,  VolunteerEmailAddress = "nevenadukic4@gmail.com" },
-                new Volunteer { VolunteerID = 3,  VolunteerFullName = "Predrag Tanaskovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 3, 5), DateFreeTo = new DateTime(2024, 6, 8), DateOfBirth = new DateTime(2001, 1, 13), RedCrossID = 4,  VolunteerEmailAddress = "predrag.tanaskovic@fonis.rs" },
-                new Volunteer { VolunteerID = 4,  VolunteerFullName = "Veljko Nedeljkovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 3, 3), DateFreeTo = new DateTime(2024, 5, 9), DateOfBirth = new DateTime(2001, 6, 6), RedCrossID = 1, VolunteerEmailAddress = "zippy@gmail.com" },
-                new Volunteer { VolunteerID = 5,  VolunteerFullName = "Vasilije Nesic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 1, 15), DateFreeTo = new DateTime(2024, 4, 17), DateOfBirth = new DateTime(2002, 5, 12), RedCrossID = 1, VolunteerEmailAddress = "nesicvasilije02@gmail.com" },
-                new Volunteer { VolunteerID = 6,  VolunteerFullName = "Minja Filip", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 3, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(2001, 9, 24), RedCrossID = 1, VolunteerEmailAddress = "filip.minja95@gmail.com" },
-                new Volunteer { VolunteerID = 7,  VolunteerFullName = "Sofija Filip", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 2, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(2001, 9, 24), RedCrossID = 1, VolunteerEmailAddress = "sfilip2022.10215@atssb.edu.rs" }
+                new Volunteer { VolunteerID = 1,  VolunteerFullName = "Iva Djokovic", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 10, 22), DateFreeTo = new DateTime(2024, 11, 10), DateOfBirth = new DateTime(2001, 4, 29), RedCrossID = 2, UserID = 9 },
+                new Volunteer { VolunteerID = 2,  VolunteerFullName = "Nevena Dukic", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 5, 1), DateFreeTo = new DateTime(2024, 7, 11), DateOfBirth = new DateTime(2001, 7, 15), RedCrossID = 2, UserID = 10 },
+                new Volunteer { VolunteerID = 3,  VolunteerFullName = "Predrag Tanaskovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 3, 5), DateFreeTo = new DateTime(2024, 6, 8), DateOfBirth = new DateTime(2001, 1, 13), RedCrossID = 1, UserID = 14},
+                new Volunteer { VolunteerID = 4,  VolunteerFullName = "Veljko Nedeljkovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 3, 3), DateFreeTo = new DateTime(2024, 5, 9), DateOfBirth = new DateTime(2001, 6, 6), RedCrossID = 1, UserID = 15},
+                new Volunteer { VolunteerID = 6,  VolunteerFullName = "Minja Filip", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 3, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(2001, 9, 24), RedCrossID = 1, UserID = 16},
+                new Volunteer { VolunteerID = 7,  VolunteerFullName = "Sofija Filip", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 2, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(2001, 9, 24), RedCrossID = 1, UserID = 17},
+                new Volunteer { VolunteerID = 8, VolunteerFullName = "Vasilije Nesic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 2, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(2002, 5, 12), RedCrossID = 2, UserID = 18 },
+                new Volunteer { VolunteerID = 9, VolunteerFullName = "Vojin Cvetkovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 2, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(2000, 8, 12), RedCrossID = 2, UserID = 19 },
+                new Volunteer { VolunteerID = 10, VolunteerFullName = "Veljko Cvetkovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 2, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(2000, 8, 12), RedCrossID = 2, UserID = 20 },
+                new Volunteer { VolunteerID = 11, VolunteerFullName = "Nikola Miletic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 2, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(1999, 9, 19), RedCrossID = 2, UserID = 21 }
                 );
 
             modelBuilder.Entity<TransfusionAction>().HasData(

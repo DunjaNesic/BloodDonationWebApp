@@ -13,8 +13,8 @@ namespace BloodDonationApp.Domain.DomainModel
         [Key]
         public int OfficialID { get; set; }
         public string OfficialFullName { get; set; } = string.Empty;
-        //public required string Username { get; set; } 
-        //public required string Password { get; set; } 
+        public int UserID { get; set; }
+        public User User { get; set; }
         public List<TransfusionAction>? ListOfActions { get; set; }
         public List<TransfusionAction>? CreatedActions { get; set; }
     }

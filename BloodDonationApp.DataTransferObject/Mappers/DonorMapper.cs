@@ -15,7 +15,6 @@ namespace BloodDonationApp.DataTransferObject.Mappers
         {
             JMBG = donor.JMBG,
             DonorFullName = donor.DonorFullName,
-            DonorEmailAddress = donor.DonorEmailAddress,
             PlaceName = donor.Place?.PlaceName ?? "Nepoznat grad",
             BloodType = donor.BloodType,
             IsActive = donor.IsActive,

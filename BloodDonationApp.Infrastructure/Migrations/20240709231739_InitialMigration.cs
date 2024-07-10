@@ -41,28 +41,29 @@ namespace BloodDonationApp.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Donors",
+                name: "Roles",
                 columns: table => new
                 {
-                    JMBG = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DonorFullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DonorEmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Sex = table.Column<int>(type: "int", nullable: false),
-                    BloodType = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    LastDonationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PlaceID = table.Column<int>(type: "int", nullable: false)
+                    RoleID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Donors", x => x.JMBG);
-                    table.ForeignKey(
-                        name: "FK_Donors_Places_PlaceID",
-                        column: x => x.PlaceID,
-                        principalTable: "Places",
-                        principalColumn: "PlaceID",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_Roles", x => x.RoleID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    UserID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.UserID);
                 });
 
             migrationBuilder.CreateTable(
@@ -86,14 +87,67 @@ namespace BloodDonationApp.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Donors",
+                columns: table => new
+                {
+                    JMBG = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DonorFullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserID = table.Column<int>(type: "int", nullable: false),
+                    Sex = table.Column<int>(type: "int", nullable: false),
+                    BloodType = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    LastDonationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PlaceID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Donors", x => x.JMBG);
+                    table.ForeignKey(
+                        name: "FK_Donors_Places_PlaceID",
+                        column: x => x.PlaceID,
+                        principalTable: "Places",
+                        principalColumn: "PlaceID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Donors_Users_UserID",
+                        column: x => x.UserID,
+                        principalTable: "Users",
+                        principalColumn: "UserID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserRoles",
+                columns: table => new
+                {
+                    RolesRoleID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UsersUserID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRoles", x => new { x.RolesRoleID, x.UsersUserID });
+                    table.ForeignKey(
+                        name: "FK_UserRoles_Roles_RolesRoleID",
+                        column: x => x.RolesRoleID,
+                        principalTable: "Roles",
+                        principalColumn: "RoleID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserRoles_Users_UsersUserID",
+                        column: x => x.UsersUserID,
+                        principalTable: "Users",
+                        principalColumn: "UserID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Officials",
                 columns: table => new
                 {
                     OfficialID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OfficialFullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserID = table.Column<int>(type: "int", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HealthcareOccupation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RedCrossID = table.Column<int>(type: "int", nullable: true)
@@ -107,6 +161,12 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         principalTable: "RedCross",
                         principalColumn: "RedCrossID",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Officials_Users_UserID",
+                        column: x => x.UserID,
+                        principalTable: "Users",
+                        principalColumn: "UserID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -116,9 +176,7 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     VolunteerID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     VolunteerFullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    VolunteerEmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserID = table.Column<int>(type: "int", nullable: false),
                     Sex = table.Column<int>(type: "int", nullable: false),
                     DateFreeFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateFreeTo = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -133,6 +191,12 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         column: x => x.RedCrossID,
                         principalTable: "RedCross",
                         principalColumn: "RedCrossID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Volunteers_Users_UserID",
+                        column: x => x.UserID,
+                        principalTable: "Users",
+                        principalColumn: "UserID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -298,16 +362,6 @@ namespace BloodDonationApp.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Officials",
-                columns: new[] { "OfficialID", "Discriminator", "OfficialFullName", "Password", "Username" },
-                values: new object[,]
-                {
-                    { 1, "Official", "Dunja Nesic", "123", "dule42" },
-                    { 2, "Official", "Stefan Jovanovic", "456", "stefanJov3107" },
-                    { 3, "Official", "Pavle Gasic", "789", "gasa" }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Places",
                 columns: new[] { "PlaceID", "PlaceName" },
                 values: new object[,]
@@ -352,22 +406,83 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     { 18, 0, "Da li ste ikada koristili bilo koju vrstu droge?" },
                     { 19, 0, "Da li ste ikada koristili preparate koji se zvanično ne izdaju na recept i/ili preparate za bodi bilding (steroide)?" },
                     { 20, 0, "Da li znate na koje sve načine ste mogli izložiti sebe riziku od zaraznih, krvlju prenosivih bolesti?" },
-                    { 21, 0, "Da li ste u proteklih 6 meseci imali neku operaciju ili primili krv?" }
+                    { 21, 0, "Da li ste u proteklih 6 meseci imali neku operaciju ili primili krv?" },
+                    { 22, 1, "Da li je davalac u dobrom opštem zdravstvenom stanju?" },
+                    { 23, 1, "Da li davalac ima normalne vitalne znakove (krvni pritisak, puls, temperatura)?" },
+                    { 24, 1, "Da li su nalazi krvne slike davaoca u granicama normale?" },
+                    { 25, 1, "Da li je koža davaoca bez osipa, rana ili infekcija?" },
+                    { 26, 1, "Da li je srčani ritam davaoca regularan bez znakova aritmije?" },
+                    { 27, 1, "Da li su pluća davaoca čista i bez znakova infekcije ili zagušenja?" },
+                    { 28, 1, "Da li davalac ima normalan nivo hemoglobina?" },
+                    { 29, 1, "Da li davalac pokazuje znake anemije ili drugih krvnih poremećaja?" },
+                    { 30, 1, "Da li je rezultat testa za HIV, hepatitis B, hepatitis C i sifilis negativan?" },
+                    { 31, 1, "Da li davalac ima adekvatan nivo hidratacije i nije dehidriran?" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "RoleID", "RoleName" },
+                values: new object[,]
+                {
+                    { "donor-role", "Donor" },
+                    { "in-charge", "OfficialInCharge" },
+                    { "itk", "MedicalOfficial" },
+                    { "official", "Official" },
+                    { "red-cross", "RedCrossOfficial" },
+                    { "volunteer-role", "Volunteer" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "UserID", "Email", "Password" },
+                values: new object[,]
+                {
+                    { 1, "mladen.mijailovic@gmail.com", "$2a$11$YXWfiQbwUkNIfWBngbEF0.ObkG0YIOPHhf51bL/SxfdTrtSHMWnOG" },
+                    { 2, "vladimir.lazarevic@gmail.com", "$2a$11$w5pkJ2avFOnRzr974jmxcOOEcM9um6iw/hrd.iCKu4AP2DHLxskca" },
+                    { 3, "sara.djokic@gmail.com", "$2a$11$m.u2OWBZzVJOSxfZv0.7u.rTgfjTiyBsSf9f9G/eUUjwg3UgfkOlq" },
+                    { 4, "nemanja.markovic@gmail.com", "$2a$11$C7nZQrsriG7U2LlRM5tjde/LCT9aQiOsfYhG0hH8P.RfN2EVLjCfy" },
+                    { 5, "djordje.mirkovic@gmail.com", "$2a$11$DF68.5gFIz/5UIvfR4aUpeKRUPvDMhssFB2km9bU0JKglNmlc9CE6" },
+                    { 6, "sandra.kovacevic@gmail.com", "$2a$11$CA8LY5pbFyTdHfygczRrY.JHef7m9pqo8QC4Qx7bk9lE2gKT3ZJFe" },
+                    { 7, "petar.nikodijevic@gmail.com", "$2a$11$q4k.42a.othLaSFpGqDE5eBA4avZTopH2ci5ZkuXTZEsFMuERO41S" },
+                    { 8, "stefan.kotlaja@gmail.com", "$2a$11$H/iRvurucqB7r34iT/dkhuEKcDcRPATTfe3tlGwllN4nCUIMabahy" },
+                    { 9, "iva.djokovic@gmail.com", "$2a$11$89OJHSDKAUPMhPnviN5rqee46r5eVsNTEJxxzOWpXSNuactNsX2UG" },
+                    { 10, "nevena.dukic@gmail.com", "$2a$11$2fkgpOBFFxj4CUZIDEk7HOJDpKRk7kOcH/EcFft0ReNn31VSPoA82" },
+                    { 11, "predrag.tanaskovic@gmail.com", "$2a$11$rklEmEk.kcpWhp1Pkrdry.qiusspLOmOJBLRryvDeAQUi/rQFzyK6" },
+                    { 12, "pavle.gasic@gmail.com", "$2a$11$HOWDneaw0n0uog7mFhWt.uuN1O75sQzuDi8NTFR9HQ3/WhP16m1f6" },
+                    { 13, "dunja.nesic@gmail.com", "$2a$11$R.EhCbON4CQyTodCXI7LNeLWY4jWTPbJxPUNbAA/sPFrnJGgHMNpK" },
+                    { 14, "stefan.jovanovic@gmail.com", "$2a$11$Ha2WR4l7FQWOsiWEJ3y0NePcDz4kikR3B95XmfBabZ/qVncUdekRG" },
+                    { 15, "veljko.nedeljkovic@gmail.com", "$2a$11$5CMei/a5zyJXKO3E0fa4Oe9g3V8tT4wXdfI/kofch7GblkQF7wCZm" },
+                    { 16, "minja.filip@gmail.com", "$2a$11$xUh2f86BxYjfdMH8U.HOeeBNwK33SrJBQXlDOHEyUKWPV/b7KwN6i" },
+                    { 17, "sofija.filip@gmail.com", "$2a$11$RRxZ8KjFaNioLokTKPVOu.ACwd0Z0N9acS.KC/zWuw1yTrAHNEAtO" },
+                    { 18, "vasilije.nesic@gmail.com", "$2a$11$P078LI76mfrd38LMAq/xOeNWSiMd1xZ6V7J3nYnvZ3dJrbupKWPky" },
+                    { 19, "vojin.cvetkovic@gmail.com", "$2a$11$qop8Sqon7QCvUdkgmlilrOk4MUPj69bHYf83PyeXtkyBrpBpFuf2C" },
+                    { 20, "veljko.cvetkovic@gmail.com", "$2a$11$JxJgmzBqh3arvxSMAIMiPOC4aDn5vHLcnXOZJTIsQ4RfqaHKdMqJ2" },
+                    { 21, "nikola.miletic@gmail.com", "$2a$11$oGUtg.IHoZU3aLGWm2/C5O.aTailywnkmzzVzScPoDTfyRGEpbY0q" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Donors",
-                columns: new[] { "JMBG", "BloodType", "DonorEmailAddress", "DonorFullName", "IsActive", "LastDonationDate", "Password", "PlaceID", "Sex" },
+                columns: new[] { "JMBG", "BloodType", "DonorFullName", "IsActive", "LastDonationDate", "PlaceID", "Sex", "UserID" },
                 values: new object[,]
                 {
-                    { "0101995700001", 6, "mijailovicmladen5@gmail.com", "Mladen Mijailovic", true, new DateTime(2024, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "comi", 12, 0 },
-                    { "0303995900003", 5, "sara.jana.djokic@gmail.com", "Sara Djokic", true, new DateTime(2023, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "srdjkc", 1, 1 },
-                    { "0407945940004", 2, "markovicc26@gmail.com", "Nemanja Markovic", false, new DateTime(2023, 5, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), "nmnj", 2, 0 },
-                    { "1104001765020", 1, "saki@gmail.com", "Sandra Kovacevic", true, new DateTime(2022, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "sakisan", 6, 1 },
-                    { "1104345940234", 4, "vladimir.lazarevic@fonis.rs", "Vladimir Lazarevic", true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "vlada", 4, 0 },
-                    { "1107001543432", 1, "pera@gmail.com", "Petar Nikodijevic", true, new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "pera", 1, 0 },
-                    { "1505001498898", 6, "kotlajic@gmail.com", "Stefan Kotlaja", true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "kotlaja", 11, 0 },
-                    { "1604345940234", 1, "djordjemirkovic001@gmail.com", "Djordje Mirkovic", true, new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "djole", 2, 0 }
+                    { "0101995700001", 6, "Mladen Mijailovic", true, new DateTime(2024, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), 12, 0, 1 },
+                    { "0303995900003", 5, "Sara Djokic", true, new DateTime(2023, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 1, 3 },
+                    { "0407945940004", 2, "Nemanja Markovic", false, new DateTime(2023, 5, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 0, 4 },
+                    { "1104001765020", 1, "Sandra Kovacevic", true, new DateTime(2022, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), 6, 1, 6 },
+                    { "1104345940234", 4, "Vladimir Lazarevic", true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, 0, 2 },
+                    { "1107001543432", 1, "Petar Nikodijevic", true, new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 0, 7 },
+                    { "1505001498898", 6, "Stefan Kotlaja", true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 11, 0, 8 },
+                    { "1604345940234", 1, "Djordje Mirkovic", true, new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 0, 5 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Officials",
+                columns: new[] { "OfficialID", "Discriminator", "OfficialFullName", "UserID" },
+                values: new object[,]
+                {
+                    { 1, "Official", "Dunja Nesic", 13 },
+                    { 2, "Official", "Stefan Jovanovic", 14 },
+                    { 3, "Official", "Pavle Gasic", 12 }
                 });
 
             migrationBuilder.InsertData(
@@ -394,6 +509,23 @@ namespace BloodDonationApp.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Volunteers",
+                columns: new[] { "VolunteerID", "DateFreeFrom", "DateFreeTo", "DateOfBirth", "RedCrossID", "Sex", "UserID", "VolunteerFullName" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 1, 9, "Iva Djokovic" },
+                    { 2, new DateTime(2024, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 7, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 7, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 1, 10, "Nevena Dukic" },
+                    { 3, new DateTime(2024, 3, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 0, 14, "Predrag Tanaskovic" },
+                    { 4, new DateTime(2024, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 5, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 0, 15, "Veljko Nedeljkovic" },
+                    { 6, new DateTime(2024, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 1, 16, "Minja Filip" },
+                    { 7, new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 1, 17, "Sofija Filip" },
+                    { 8, new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 0, 18, "Vasilije Nesic" },
+                    { 9, new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2000, 8, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 0, 19, "Vojin Cvetkovic" },
+                    { 10, new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2000, 8, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 0, 20, "Veljko Cvetkovic" },
+                    { 11, new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1999, 9, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 0, 21, "Nikola Miletic" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "CallsToDonate",
                 columns: new[] { "ActionID", "JMBG", "AcceptedTheCall", "ShowedUp" },
                 values: new object[,]
@@ -406,30 +538,6 @@ namespace BloodDonationApp.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Questionnaires",
-                columns: new[] { "ActionID", "JMBG", "Approved", "QRCode", "QuestionnaireTitle", "Remark" },
-                values: new object[,]
-                {
-                    { 5, "0101995700001", false, null, "Upitnik za akciju Daj krv, spasi zivot u Novom Pazaru", "Odbijen zbog niskog krvnog pritiska" },
-                    { 1, "1104345940234", true, null, "Upitnik za akciju na FON-u", "/" },
-                    { 3, "1104345940234", true, null, "Upitnik za akciju u Vozdovim kapijama", "Sve ok" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Volunteers",
-                columns: new[] { "VolunteerID", "DateFreeFrom", "DateFreeTo", "DateOfBirth", "Password", "RedCrossID", "Sex", "Username", "VolunteerEmailAddress", "VolunteerFullName" },
-                values: new object[,]
-                {
-                    { 1, new DateTime(2024, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified), "poz", 2, 1, "pozitiva", "iva.djokovic@fonis.rs", "Iva Djokovic" },
-                    { 2, new DateTime(2024, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 7, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 7, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "nensi", 2, 1, "nensi", "nevenadukic4@gmail.com", "Nevena Dukic" },
-                    { 3, new DateTime(2024, 3, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "pedja", 4, 0, "djpedja", "predrag.tanaskovic@fonis.rs", "Predrag Tanaskovic" },
-                    { 4, new DateTime(2024, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 5, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), "zephe", 1, 0, "zippy", "zippy@gmail.com", "Veljko Nedeljkovic" },
-                    { 5, new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 17, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "nesic", 1, 0, "vasa", "nesicvasilije02@gmail.com", "Vasilije Nesic" },
-                    { 6, new DateTime(2024, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "leptirica", 1, 1, "minja", "filip.minja95@gmail.com", "Minja Filip" },
-                    { 7, new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "sof", 1, 1, "sofija", "sfilip2022.10215@atssb.edu.rs", "Sofija Filip" }
-                });
-
-            migrationBuilder.InsertData(
                 table: "CallsToVolunteer",
                 columns: new[] { "ActionID", "VolunteerID", "AcceptedTheCall", "ShowedUp" },
                 values: new object[,]
@@ -439,6 +547,16 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     { 3, 1, false, true },
                     { 4, 1, false, false },
                     { 5, 1, true, true }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Questionnaires",
+                columns: new[] { "ActionID", "JMBG", "Approved", "QRCode", "QuestionnaireTitle", "Remark" },
+                values: new object[,]
+                {
+                    { 5, "0101995700001", false, null, "Upitnik za akciju Daj krv, spasi zivot u Novom Pazaru", "Odbijen zbog niskog krvnog pritiska" },
+                    { 1, "1104345940234", true, null, "Upitnik za akciju na FON-u", "/" },
+                    { 3, "1104345940234", true, null, "Upitnik za akciju u Vozdovim kapijama", "Sve ok" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -462,9 +580,21 @@ namespace BloodDonationApp.Infrastructure.Migrations
                 column: "PlaceID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Donors_UserID",
+                table: "Donors",
+                column: "UserID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Officials_RedCrossID",
                 table: "Officials",
                 column: "RedCrossID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Officials_UserID",
+                table: "Officials",
+                column: "UserID",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuestionnaireQuestions_QuestionnaireJMBG_QuestionnaireActionID",
@@ -492,9 +622,20 @@ namespace BloodDonationApp.Infrastructure.Migrations
                 column: "PlaceID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserRoles_UsersUserID",
+                table: "UserRoles",
+                column: "UsersUserID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Volunteers_RedCrossID",
                 table: "Volunteers",
                 column: "RedCrossID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Volunteers_UserID",
+                table: "Volunteers",
+                column: "UserID",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -513,6 +654,9 @@ namespace BloodDonationApp.Infrastructure.Migrations
                 name: "QuestionnaireQuestions");
 
             migrationBuilder.DropTable(
+                name: "UserRoles");
+
+            migrationBuilder.DropTable(
                 name: "Volunteers");
 
             migrationBuilder.DropTable(
@@ -520,6 +664,9 @@ namespace BloodDonationApp.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Questions");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Donors");
@@ -532,6 +679,9 @@ namespace BloodDonationApp.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "RedCross");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Places");

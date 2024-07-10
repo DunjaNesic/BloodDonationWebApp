@@ -4,6 +4,7 @@ using BloodDonationApp.DataAccessLayer.DonorRepo;
 using BloodDonationApp.DataAccessLayer.PlaceRepo;
 using BloodDonationApp.DataAccessLayer.QuestionnaireRepo;
 using BloodDonationApp.DataAccessLayer.QuestionRepo;
+using BloodDonationApp.DataAccessLayer.UserRepo;
 using BloodDonationApp.DataAccessLayer.VolCallsRepo;
 using BloodDonationApp.DataAccessLayer.VolunteerRepo;
 using BloodDonationApp.Infrastructure;
@@ -26,6 +27,7 @@ namespace BloodDonationApp.DataAccessLayer.UnitOfWork
         private readonly Lazy<IVolunteerRepository> _volunteerRepository;
         private readonly Lazy<IDonorCallsRepository> _donorCallsRepository;
         private readonly Lazy<IVolCallsRepository> _volunteerCallsRepository;
+        private readonly Lazy<IUserRepository> _userRepository;
 
         public UnitOfWork(BloodDonationContext context)
         {
@@ -38,6 +40,7 @@ namespace BloodDonationApp.DataAccessLayer.UnitOfWork
             _volunteerRepository = new Lazy<IVolunteerRepository>(() => new VolunteerRepository(_context));
             _donorCallsRepository = new Lazy<IDonorCallsRepository>(() => new DonorCallsRepository(_context));
             _volunteerCallsRepository = new Lazy<IVolCallsRepository>(() => new VolCallsRepository(_context));
+            _userRepository = new Lazy<IUserRepository>(() => new UserRepository(_context));
         }
 
         public IActionRepository ActionRepository => _actionRepository.Value;
@@ -48,6 +51,7 @@ namespace BloodDonationApp.DataAccessLayer.UnitOfWork
         public IVolunteerRepository VolunteerRepository => _volunteerRepository.Value;
         public IDonorCallsRepository DonorCallsRepository => _donorCallsRepository.Value;
         public IVolCallsRepository VolunteerCallsRepository => _volunteerCallsRepository.Value;
+        public IUserRepository UserRepository => _userRepository.Value;
 
         public async Task SaveChanges() => await _context.SaveChangesAsync();
     }

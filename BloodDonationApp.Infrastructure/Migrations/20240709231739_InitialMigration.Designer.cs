@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BloodDonationApp.Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationContext))]
-    [Migration("20240708225857_AddedQuestions")]
-    partial class AddedQuestions
+    [Migration("20240709231739_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -164,10 +164,6 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     b.Property<int>("BloodType")
                         .HasColumnType("int");
 
-                    b.Property<string>("DonorEmailAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("DonorFullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -184,9 +180,15 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     b.Property<int>("Sex")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("JMBG");
 
                     b.HasIndex("PlaceID");
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
 
                     b.ToTable("Donors");
 
@@ -195,89 +197,89 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         {
                             JMBG = "0101995700001",
                             BloodType = 6,
-                            DonorEmailAddress = "mijailovicmladen5@gmail.com",
                             DonorFullName = "Mladen Mijailovic",
                             IsActive = true,
                             LastDonationDate = new DateTime(2024, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PlaceID = 12,
-                            Sex = 0
+                            Sex = 0,
+                            UserID = 1
                         },
                         new
                         {
                             JMBG = "1104345940234",
                             BloodType = 4,
-                            DonorEmailAddress = "vladimir.lazarevic@fonis.rs",
                             DonorFullName = "Vladimir Lazarevic",
                             IsActive = true,
                             LastDonationDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PlaceID = 4,
-                            Sex = 0
+                            Sex = 0,
+                            UserID = 2
                         },
                         new
                         {
                             JMBG = "0303995900003",
                             BloodType = 5,
-                            DonorEmailAddress = "sara.jana.djokic@gmail.com",
                             DonorFullName = "Sara Djokic",
                             IsActive = true,
                             LastDonationDate = new DateTime(2023, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PlaceID = 1,
-                            Sex = 1
+                            Sex = 1,
+                            UserID = 3
                         },
                         new
                         {
                             JMBG = "0407945940004",
                             BloodType = 2,
-                            DonorEmailAddress = "markovicc26@gmail.com",
                             DonorFullName = "Nemanja Markovic",
                             IsActive = false,
                             LastDonationDate = new DateTime(2023, 5, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PlaceID = 2,
-                            Sex = 0
+                            Sex = 0,
+                            UserID = 4
                         },
                         new
                         {
                             JMBG = "1604345940234",
                             BloodType = 1,
-                            DonorEmailAddress = "djordjemirkovic001@gmail.com",
                             DonorFullName = "Djordje Mirkovic",
                             IsActive = true,
                             LastDonationDate = new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PlaceID = 2,
-                            Sex = 0
+                            Sex = 0,
+                            UserID = 5
                         },
                         new
                         {
                             JMBG = "1104001765020",
                             BloodType = 1,
-                            DonorEmailAddress = "saki@gmail.com",
                             DonorFullName = "Sandra Kovacevic",
                             IsActive = true,
                             LastDonationDate = new DateTime(2022, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PlaceID = 6,
-                            Sex = 1
+                            Sex = 1,
+                            UserID = 6
                         },
                         new
                         {
                             JMBG = "1107001543432",
                             BloodType = 1,
-                            DonorEmailAddress = "pera@gmail.com",
                             DonorFullName = "Petar Nikodijevic",
                             IsActive = true,
                             LastDonationDate = new DateTime(2023, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PlaceID = 1,
-                            Sex = 0
+                            Sex = 0,
+                            UserID = 7
                         },
                         new
                         {
                             JMBG = "1505001498898",
                             BloodType = 6,
-                            DonorEmailAddress = "kotlajic@gmail.com",
                             DonorFullName = "Stefan Kotlaja",
                             IsActive = true,
                             LastDonationDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PlaceID = 11,
-                            Sex = 0
+                            Sex = 0,
+                            UserID = 8
                         });
                 });
 
@@ -297,7 +299,13 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("OfficialID");
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
 
                     b.ToTable("Officials");
 
@@ -309,17 +317,20 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         new
                         {
                             OfficialID = 1,
-                            OfficialFullName = "Dunja Nesic"
+                            OfficialFullName = "Dunja Nesic",
+                            UserID = 13
                         },
                         new
                         {
                             OfficialID = 2,
-                            OfficialFullName = "Stefan Jovanovic"
+                            OfficialFullName = "Stefan Jovanovic",
+                            UserID = 14
                         },
                         new
                         {
                             OfficialID = 3,
-                            OfficialFullName = "Pavle Gasic"
+                            OfficialFullName = "Pavle Gasic",
+                            UserID = 12
                         });
                 });
 
@@ -761,6 +772,52 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BloodDonationApp.Domain.DomainModel.Role", b =>
+                {
+                    b.Property<string>("RoleID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RoleID");
+
+                    b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleID = "donor-role",
+                            RoleName = "Donor"
+                        },
+                        new
+                        {
+                            RoleID = "volunteer-role",
+                            RoleName = "Volunteer"
+                        },
+                        new
+                        {
+                            RoleID = "red-cross",
+                            RoleName = "RedCrossOfficial"
+                        },
+                        new
+                        {
+                            RoleID = "itk",
+                            RoleName = "MedicalOfficial"
+                        },
+                        new
+                        {
+                            RoleID = "official",
+                            RoleName = "Official"
+                        },
+                        new
+                        {
+                            RoleID = "in-charge",
+                            RoleName = "OfficialInCharge"
+                        });
+                });
+
             modelBuilder.Entity("BloodDonationApp.Domain.DomainModel.TransfusionAction", b =>
                 {
                     b.Property<int>("ActionID")
@@ -858,6 +915,153 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BloodDonationApp.Domain.DomainModel.User", b =>
+                {
+                    b.Property<int>("UserID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserID");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserID = 1,
+                            Email = "mladen.mijailovic@gmail.com",
+                            Password = "$2a$11$YXWfiQbwUkNIfWBngbEF0.ObkG0YIOPHhf51bL/SxfdTrtSHMWnOG"
+                        },
+                        new
+                        {
+                            UserID = 2,
+                            Email = "vladimir.lazarevic@gmail.com",
+                            Password = "$2a$11$w5pkJ2avFOnRzr974jmxcOOEcM9um6iw/hrd.iCKu4AP2DHLxskca"
+                        },
+                        new
+                        {
+                            UserID = 3,
+                            Email = "sara.djokic@gmail.com",
+                            Password = "$2a$11$m.u2OWBZzVJOSxfZv0.7u.rTgfjTiyBsSf9f9G/eUUjwg3UgfkOlq"
+                        },
+                        new
+                        {
+                            UserID = 4,
+                            Email = "nemanja.markovic@gmail.com",
+                            Password = "$2a$11$C7nZQrsriG7U2LlRM5tjde/LCT9aQiOsfYhG0hH8P.RfN2EVLjCfy"
+                        },
+                        new
+                        {
+                            UserID = 5,
+                            Email = "djordje.mirkovic@gmail.com",
+                            Password = "$2a$11$DF68.5gFIz/5UIvfR4aUpeKRUPvDMhssFB2km9bU0JKglNmlc9CE6"
+                        },
+                        new
+                        {
+                            UserID = 6,
+                            Email = "sandra.kovacevic@gmail.com",
+                            Password = "$2a$11$CA8LY5pbFyTdHfygczRrY.JHef7m9pqo8QC4Qx7bk9lE2gKT3ZJFe"
+                        },
+                        new
+                        {
+                            UserID = 7,
+                            Email = "petar.nikodijevic@gmail.com",
+                            Password = "$2a$11$q4k.42a.othLaSFpGqDE5eBA4avZTopH2ci5ZkuXTZEsFMuERO41S"
+                        },
+                        new
+                        {
+                            UserID = 8,
+                            Email = "stefan.kotlaja@gmail.com",
+                            Password = "$2a$11$H/iRvurucqB7r34iT/dkhuEKcDcRPATTfe3tlGwllN4nCUIMabahy"
+                        },
+                        new
+                        {
+                            UserID = 9,
+                            Email = "iva.djokovic@gmail.com",
+                            Password = "$2a$11$89OJHSDKAUPMhPnviN5rqee46r5eVsNTEJxxzOWpXSNuactNsX2UG"
+                        },
+                        new
+                        {
+                            UserID = 10,
+                            Email = "nevena.dukic@gmail.com",
+                            Password = "$2a$11$2fkgpOBFFxj4CUZIDEk7HOJDpKRk7kOcH/EcFft0ReNn31VSPoA82"
+                        },
+                        new
+                        {
+                            UserID = 11,
+                            Email = "predrag.tanaskovic@gmail.com",
+                            Password = "$2a$11$rklEmEk.kcpWhp1Pkrdry.qiusspLOmOJBLRryvDeAQUi/rQFzyK6"
+                        },
+                        new
+                        {
+                            UserID = 12,
+                            Email = "pavle.gasic@gmail.com",
+                            Password = "$2a$11$HOWDneaw0n0uog7mFhWt.uuN1O75sQzuDi8NTFR9HQ3/WhP16m1f6"
+                        },
+                        new
+                        {
+                            UserID = 13,
+                            Email = "dunja.nesic@gmail.com",
+                            Password = "$2a$11$R.EhCbON4CQyTodCXI7LNeLWY4jWTPbJxPUNbAA/sPFrnJGgHMNpK"
+                        },
+                        new
+                        {
+                            UserID = 14,
+                            Email = "stefan.jovanovic@gmail.com",
+                            Password = "$2a$11$Ha2WR4l7FQWOsiWEJ3y0NePcDz4kikR3B95XmfBabZ/qVncUdekRG"
+                        },
+                        new
+                        {
+                            UserID = 15,
+                            Email = "veljko.nedeljkovic@gmail.com",
+                            Password = "$2a$11$5CMei/a5zyJXKO3E0fa4Oe9g3V8tT4wXdfI/kofch7GblkQF7wCZm"
+                        },
+                        new
+                        {
+                            UserID = 16,
+                            Email = "minja.filip@gmail.com",
+                            Password = "$2a$11$xUh2f86BxYjfdMH8U.HOeeBNwK33SrJBQXlDOHEyUKWPV/b7KwN6i"
+                        },
+                        new
+                        {
+                            UserID = 17,
+                            Email = "sofija.filip@gmail.com",
+                            Password = "$2a$11$RRxZ8KjFaNioLokTKPVOu.ACwd0Z0N9acS.KC/zWuw1yTrAHNEAtO"
+                        },
+                        new
+                        {
+                            UserID = 18,
+                            Email = "vasilije.nesic@gmail.com",
+                            Password = "$2a$11$P078LI76mfrd38LMAq/xOeNWSiMd1xZ6V7J3nYnvZ3dJrbupKWPky"
+                        },
+                        new
+                        {
+                            UserID = 19,
+                            Email = "vojin.cvetkovic@gmail.com",
+                            Password = "$2a$11$qop8Sqon7QCvUdkgmlilrOk4MUPj69bHYf83PyeXtkyBrpBpFuf2C"
+                        },
+                        new
+                        {
+                            UserID = 20,
+                            Email = "veljko.cvetkovic@gmail.com",
+                            Password = "$2a$11$JxJgmzBqh3arvxSMAIMiPOC4aDn5vHLcnXOZJTIsQ4RfqaHKdMqJ2"
+                        },
+                        new
+                        {
+                            UserID = 21,
+                            Email = "nikola.miletic@gmail.com",
+                            Password = "$2a$11$oGUtg.IHoZU3aLGWm2/C5O.aTailywnkmzzVzScPoDTfyRGEpbY0q"
+                        });
+                });
+
             modelBuilder.Entity("BloodDonationApp.Domain.DomainModel.Volunteer", b =>
                 {
                     b.Property<int>("VolunteerID")
@@ -881,9 +1085,8 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     b.Property<int>("Sex")
                         .HasColumnType("int");
 
-                    b.Property<string>("VolunteerEmailAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
 
                     b.Property<string>("VolunteerFullName")
                         .IsRequired()
@@ -892,6 +1095,9 @@ namespace BloodDonationApp.Infrastructure.Migrations
                     b.HasKey("VolunteerID");
 
                     b.HasIndex("RedCrossID");
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
 
                     b.ToTable("Volunteers");
 
@@ -904,7 +1110,7 @@ namespace BloodDonationApp.Infrastructure.Migrations
                             DateOfBirth = new DateTime(2001, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RedCrossID = 2,
                             Sex = 1,
-                            VolunteerEmailAddress = "iva.djokovic@fonis.rs",
+                            UserID = 9,
                             VolunteerFullName = "Iva Djokovic"
                         },
                         new
@@ -915,7 +1121,7 @@ namespace BloodDonationApp.Infrastructure.Migrations
                             DateOfBirth = new DateTime(2001, 7, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RedCrossID = 2,
                             Sex = 1,
-                            VolunteerEmailAddress = "nevenadukic4@gmail.com",
+                            UserID = 10,
                             VolunteerFullName = "Nevena Dukic"
                         },
                         new
@@ -924,9 +1130,9 @@ namespace BloodDonationApp.Infrastructure.Migrations
                             DateFreeFrom = new DateTime(2024, 3, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateFreeTo = new DateTime(2024, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(2001, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RedCrossID = 4,
+                            RedCrossID = 1,
                             Sex = 0,
-                            VolunteerEmailAddress = "predrag.tanaskovic@fonis.rs",
+                            UserID = 14,
                             VolunteerFullName = "Predrag Tanaskovic"
                         },
                         new
@@ -937,19 +1143,8 @@ namespace BloodDonationApp.Infrastructure.Migrations
                             DateOfBirth = new DateTime(2001, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RedCrossID = 1,
                             Sex = 0,
-                            VolunteerEmailAddress = "zippy@gmail.com",
+                            UserID = 15,
                             VolunteerFullName = "Veljko Nedeljkovic"
-                        },
-                        new
-                        {
-                            VolunteerID = 5,
-                            DateFreeFrom = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateFreeTo = new DateTime(2024, 4, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2002, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RedCrossID = 1,
-                            Sex = 0,
-                            VolunteerEmailAddress = "nesicvasilije02@gmail.com",
-                            VolunteerFullName = "Vasilije Nesic"
                         },
                         new
                         {
@@ -959,7 +1154,7 @@ namespace BloodDonationApp.Infrastructure.Migrations
                             DateOfBirth = new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RedCrossID = 1,
                             Sex = 1,
-                            VolunteerEmailAddress = "filip.minja95@gmail.com",
+                            UserID = 16,
                             VolunteerFullName = "Minja Filip"
                         },
                         new
@@ -970,9 +1165,68 @@ namespace BloodDonationApp.Infrastructure.Migrations
                             DateOfBirth = new DateTime(2001, 9, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RedCrossID = 1,
                             Sex = 1,
-                            VolunteerEmailAddress = "sfilip2022.10215@atssb.edu.rs",
+                            UserID = 17,
                             VolunteerFullName = "Sofija Filip"
+                        },
+                        new
+                        {
+                            VolunteerID = 8,
+                            DateFreeFrom = new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateFreeTo = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(2002, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RedCrossID = 2,
+                            Sex = 0,
+                            UserID = 18,
+                            VolunteerFullName = "Vasilije Nesic"
+                        },
+                        new
+                        {
+                            VolunteerID = 9,
+                            DateFreeFrom = new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateFreeTo = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(2000, 8, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RedCrossID = 2,
+                            Sex = 0,
+                            UserID = 19,
+                            VolunteerFullName = "Vojin Cvetkovic"
+                        },
+                        new
+                        {
+                            VolunteerID = 10,
+                            DateFreeFrom = new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateFreeTo = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(2000, 8, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RedCrossID = 2,
+                            Sex = 0,
+                            UserID = 20,
+                            VolunteerFullName = "Veljko Cvetkovic"
+                        },
+                        new
+                        {
+                            VolunteerID = 11,
+                            DateFreeFrom = new DateTime(2024, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateFreeTo = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(1999, 9, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RedCrossID = 2,
+                            Sex = 0,
+                            UserID = 21,
+                            VolunteerFullName = "Nikola Miletic"
                         });
+                });
+
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.Property<string>("RolesRoleID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("UsersUserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("RolesRoleID", "UsersUserID");
+
+                    b.HasIndex("UsersUserID");
+
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("BloodDonationApp.Domain.DomainModel.MedicalWorker", b =>
@@ -1058,7 +1312,26 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BloodDonationApp.Domain.DomainModel.User", "User")
+                        .WithOne()
+                        .HasForeignKey("BloodDonationApp.Domain.DomainModel.Donor", "UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Place");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BloodDonationApp.Domain.DomainModel.Official", b =>
+                {
+                    b.HasOne("BloodDonationApp.Domain.DomainModel.User", "User")
+                        .WithOne()
+                        .HasForeignKey("BloodDonationApp.Domain.DomainModel.Official", "UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BloodDonationApp.Domain.DomainModel.Questionnaire", b =>
@@ -1137,7 +1410,30 @@ namespace BloodDonationApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BloodDonationApp.Domain.DomainModel.User", "User")
+                        .WithOne()
+                        .HasForeignKey("BloodDonationApp.Domain.DomainModel.Volunteer", "UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("RedCross");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.HasOne("BloodDonationApp.Domain.DomainModel.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesRoleID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BloodDonationApp.Domain.DomainModel.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersUserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BloodDonationApp.Domain.DomainModel.RedCrossWorker", b =>

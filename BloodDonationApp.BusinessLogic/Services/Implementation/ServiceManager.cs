@@ -6,6 +6,7 @@ using BloodDonationApp.DataTransferObject.Mappers;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.LoggerService;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +23,9 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         private readonly Lazy<IQuestionnaireService> _questionnaireService;
         private readonly Lazy<IQuestionService> _questionService;
         private readonly Lazy<IVolunteerService> _volunteerService;
+        private readonly Lazy<IAuthenticationService> _authenticationService;   
 
-        public ServiceManager(IUnitOfWork uow, ILoggerManager _logger, IDataShaper<GetTransfusionActionDTO> _dataShaper )
+        public ServiceManager(IUnitOfWork uow, ILoggerManager _logger, IDataShaper<GetTransfusionActionDTO> _dataShaper, IConfiguration _configuration )
         {
             _actionService = new Lazy<IActionService>(() => new ActionService(uow, _logger, _dataShaper));
             _donorService = new Lazy<IDonorService>(() => new DonorService(uow, _logger));
@@ -31,6 +33,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             _questionnaireService = new Lazy<IQuestionnaireService>(() => new QuestionnaireService(uow, _logger));
             _questionService = new Lazy<IQuestionService>(() => new QuestionService(uow));
             _volunteerService = new Lazy<IVolunteerService>(() => new VolunteerService(uow, _logger));
+            _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(uow, _logger, _configuration));
         }
 
         public IActionService ActionService => _actionService.Value;
@@ -39,5 +42,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         public IQuestionnaireService QuestionnaireService => _questionnaireService.Value;  
         public IQuestionService QuestionService => _questionService.Value;
         public IVolunteerService VolunteerService => _volunteerService.Value;
+        public IAuthenticationService AuthenticationService => _authenticationService.Value;
     }
 }

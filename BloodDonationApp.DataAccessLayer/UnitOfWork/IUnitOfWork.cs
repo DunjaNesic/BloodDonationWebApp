@@ -4,8 +4,10 @@ using BloodDonationApp.DataAccessLayer.DonorRepo;
 using BloodDonationApp.DataAccessLayer.PlaceRepo;
 using BloodDonationApp.DataAccessLayer.QuestionnaireRepo;
 using BloodDonationApp.DataAccessLayer.QuestionRepo;
+using BloodDonationApp.DataAccessLayer.UserRepo;
 using BloodDonationApp.DataAccessLayer.VolCallsRepo;
 using BloodDonationApp.DataAccessLayer.VolunteerRepo;
+using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -25,6 +27,7 @@ namespace BloodDonationApp.DataAccessLayer.UnitOfWork
         IVolunteerRepository VolunteerRepository { get; }
         IDonorCallsRepository DonorCallsRepository { get; }
         IVolCallsRepository VolunteerCallsRepository { get; }
+        IUserRepository UserRepository { get; }
         Task SaveChanges();
     }
 }
