@@ -2,6 +2,7 @@
 using BloodDonationApp.DataTransferObject.Users;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Presentation.ActionFilters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -41,9 +42,16 @@ namespace BloodDonationApp.Presentation.Controllers
         [HttpPost("/token")]
         public async Task<IActionResult> Refresh([FromBody] TokenDTO tokenDTO)
         {
-            var tokenDtoToReturn = await
-            _serviceManager.AuthenticationService.RefreshToken(tokenDTO);
+            var tokenDtoToReturn = await _serviceManager.AuthenticationService.RefreshToken(tokenDTO);
             return Ok(tokenDtoToReturn);
+        }
+
+        [HttpPost]
+        [Route("/revoke")]
+        public async Task<IActionResult> Revoke()
+        {
+           await _serviceManager.AuthenticationService.RevokeToken();
+            return Ok();
         }
 
     }

@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
 using BloodDonationApp.Presentation.ActionFilters;
 using BloodDonationApp.DataTransferObject.Action;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +35,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
 builder.Services.AddScoped<IDataShaper<GetTransfusionActionDTO>, DataShaper<GetTransfusionActionDTO>>();
-builder.Services.AddScoped<ValidateMediaTypeAttribute>();
+//builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 builder.Services.ConfigureCors();
 builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureSqlServerContext(builder.Configuration);
@@ -50,27 +52,26 @@ builder.Services.AddControllers(config =>
 {
     config.RespectBrowserAcceptHeader = true;
     config.ReturnHttpNotAcceptable = true;
+
     //necemo response cachinggg
     //config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
     //{
     //    Duration = 120
     //});
-}).AddXmlDataContractSerializerFormatters()
+
+})
+    .AddNewtonsoftJson()   
+    .AddXmlDataContractSerializerFormatters()
     .AddApplicationPart(typeof(BloodDonationApp.Presentation.AssemblyReference).Assembly);
 
-//kad ovo stoji ovde onda dunja.xml radi kad stoji iznad onda ne radi a dunja.json ne radi nikad ??
 builder.Services.AddCustomMediaTypes();
+
+builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.SuppressModelStateInvalidFilter = true;
-});
-
 
 var app = builder.Build();
 

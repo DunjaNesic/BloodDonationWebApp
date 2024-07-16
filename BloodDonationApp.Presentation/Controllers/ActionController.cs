@@ -41,9 +41,9 @@ namespace BloodDonationApp.Presentation.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Donor")]
+        //[Authorize(Roles = "Donor")]
         [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
-        public async Task<ActionResult<IEnumerable<GetTransfusionActionDTO>>> GetAllActions([FromQuery] ActionParameters actionParameters )
+        public async Task<IActionResult> GetAllActions([FromQuery] ActionParameters actionParameters )
         {
             var baseResult = await _serviceManager.ActionService.GetAll(false, actionParameters);
             if (!baseResult.Success) return ProcessError(baseResult);

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace BloodDonationApp.Domain.DomainModel
 {
     [DataContract(IsReference = true)]
+
     public class TransfusionAction
     {
         [Key]

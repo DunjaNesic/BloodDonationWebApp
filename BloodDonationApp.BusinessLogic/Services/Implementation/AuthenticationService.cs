@@ -2,19 +2,13 @@
 using BloodDonationApp.DataAccessLayer.UnitOfWork;
 using BloodDonationApp.DataTransferObject.Users;
 using BloodDonationApp.Domain.DomainModel;
-using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Volunteer;
 using BloodDonationApp.LoggerService;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BloodDonationApp.BusinessLogic.Services.Implementation
 {
@@ -159,11 +153,17 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             var principal = GetPrincipalFromExpiredToken(tokenDTO.AccessToken);
 
             User? targetUser = await _uow.UserRepository.FindByEmailAsync(principal?.Identity?.Name);
-            if (targetUser == null || user?.RefreshToken != tokenDTO.RefreshToken ||
-            targetUser.RefreshTokenExpiryTime <= DateTime.Now)
+            if (targetUser == null || targetUser?.RefreshToken != tokenDTO.RefreshToken ||
+            targetUser?.RefreshTokenExpiryTime <= DateTime.Now)
                 throw new Exception("promenicu ovo posle");
+            
             user = targetUser;
             return await CreateToken(false);
+        }
+
+        public Task RevokeToken()
+        {
+            throw new NotImplementedException();
         }
     }
  }

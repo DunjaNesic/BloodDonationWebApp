@@ -10,6 +10,8 @@ using System.Threading.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Net.Http.Headers;
+//using System.Net.Http.Headers;
 
 namespace BloodDonationApp.API.Extensions
 {
@@ -40,13 +42,12 @@ namespace BloodDonationApp.API.Extensions
         {
             services.Configure<MvcOptions>(config =>
             {
-                var systemTextJsonOutputFormatter = config.OutputFormatters
-                .OfType<SystemTextJsonOutputFormatter>()?
+                var jsonOutputFormatter = config.OutputFormatters
+                .OfType<NewtonsoftJsonOutputFormatter>()?
                 .FirstOrDefault();
-                if (systemTextJsonOutputFormatter != null)
+                if (jsonOutputFormatter != null)
                 {
-                    systemTextJsonOutputFormatter.SupportedMediaTypes
-                    .Add("application/vnd.dunja.hateoas+json");
+                    jsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.dunja.hateoas+json");
                     Console.WriteLine("Registered custom media type: application/vnd.dunja.hateoas+json");
                 }
                 var xmlOutputFormatter = config.OutputFormatters
@@ -54,8 +55,7 @@ namespace BloodDonationApp.API.Extensions
                 .FirstOrDefault();
                 if (xmlOutputFormatter != null)
                 {
-                    xmlOutputFormatter.SupportedMediaTypes
-                    .Add("application/vnd.dunja.hateoas+xml");
+                    xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.dunja.hateoas+xml");
                     Console.WriteLine("Registered custom media type: application/vnd.dunja.hateoas+xml");
                 }
             });

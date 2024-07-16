@@ -14,5 +14,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
         Task<bool> ValidateUser(UserLoginDTO userForLogin);
         Task<TokenDTO> CreateToken(bool includeExpiry);
         Task<TokenDTO> RefreshToken(TokenDTO tokenDto);
+        Task RevokeToken();
     }
 }

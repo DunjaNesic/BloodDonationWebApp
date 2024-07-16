@@ -16,27 +16,41 @@ namespace BloodDonationApp.Presentation.ActionFilters
     {
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var acceptHeaderPresent = context.HttpContext
-             .Request.Headers.ContainsKey("Accept");
+            const string acceptHeaderName = "Accept";
 
+            var acceptHeaderPresent = context.HttpContext.Request.Headers.ContainsKey(acceptHeaderName);
             if (!acceptHeaderPresent)
             {
-                context.Result = new BadRequestObjectResult($"Accept header is missing."); 
-             return;
+                context.Result = new BadRequestObjectResult("Accept header is missing.");
+                return;
             }
 
-            var mediaType = context.HttpContext
-             .Request.Headers["Accept"].FirstOrDefault();
-
-            if (!MediaTypeHeaderValue.TryParse(mediaType, out MediaTypeHeaderValue?outMediaType))
+            var mediaTypeHeaderValue = context.HttpContext.Request.Headers[acceptHeaderName].FirstOrDefault();
+            if (string.IsNullOrEmpty(mediaTypeHeaderValue))
             {
-                context.Result = new BadRequestObjectResult($"Media type not present. Please add Accept header with the required media type."); 
-             return;
+                context.Result = new BadRequestObjectResult("Media type not present. Please add Accept header with the required media type.");
+                return;
             }
 
-            context.HttpContext.Items.Add("AcceptHeaderMediaType", outMediaType);
-        }
+            var mediaTypes = mediaTypeHeaderValue.Split(',').Select(mt => mt.Trim()).ToList();
 
-        public void OnActionExecuted(ActionExecutedContext context) { }
+            bool isValidMediaType = false;
+            foreach (var mediaType in mediaTypes)
+            {
+                if (MediaTypeHeaderValue.TryParse(mediaType, out MediaTypeHeaderValue? outMediaType))
+                {
+                    context.HttpContext.Items.Add("AcceptHeaderMediaType", outMediaType);
+                    isValidMediaType = true;
+                    break;
+                }
+            }
+
+            if (!isValidMediaType)
+            {
+                context.Result = new BadRequestObjectResult("Invalid media type. Please add a valid Accept header with the required media type.");
+                return;
+            }
+        }
+            public void OnActionExecuted(ActionExecutedContext context) { }
     }
 }
