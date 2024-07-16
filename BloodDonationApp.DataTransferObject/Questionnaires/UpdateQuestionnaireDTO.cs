@@ -12,7 +12,6 @@ namespace BloodDonationApp.DataTransferObject.Questionnaires
         public string? Remark { get; set; }
         public List<bool> Answers { get; set; } = new List<bool>();
         public bool Approved { get; set; }
-        public string? QRCode { get; set; }
         public byte[] RowVersion { get; set; } = Array.Empty<byte>();
     }
 }

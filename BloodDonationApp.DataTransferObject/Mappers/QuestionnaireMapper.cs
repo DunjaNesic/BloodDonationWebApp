@@ -1,8 +1,6 @@
 ﻿using BloodDonationApp.DataTransferObject;
 using BloodDonationApp.DataTransferObject.Questionnaires;
 using BloodDonationApp.Domain.DomainModel;
-using QRCoder;
-using System.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +11,16 @@ namespace BloodDonationApp.DataTransferObject.Mappers
 {
     public class QuestionnaireMapper : IMapperCustom<GetQuestionnaireDTO, Questionnaire>
     {
+        public QuestionnaireQuestionDTO ToDto(QuestionnaireQuestion question) => new()
+        {
+            QuestionID = question.QuestionID,
+            Answer = question.Answer
+        };
         public GetQuestionnaireDTO ToDto(Questionnaire questionnaire) => new()
         {
             QuestionnaireTitle = questionnaire.QuestionnaireTitle,
             Remark = questionnaire.Remark,
-            AnsweredQuestions = questionnaire.ListOfQuestions
+            AnsweredQuestions = questionnaire.ListOfQuestions?.Select(q => this.ToDto(q)).ToList()
         };
 
         public Questionnaire FromDto(CreateQuestionnaireDTO dto, IEnumerable<Question> questions)
@@ -31,8 +34,6 @@ namespace BloodDonationApp.DataTransferObject.Mappers
 
             return new Questionnaire
             {
-                JMBG = dto.JMBG,
-                ActionID = dto.ActionID,
                 QuestionnaireTitle = dto.QuestionnaireTitle,
                 Remark = dto.Remark,
                 DateOfMaking = dto.DateOfMaking,
@@ -52,26 +53,11 @@ namespace BloodDonationApp.DataTransferObject.Mappers
             while (dto.Answers.Count < questionList.Count)
             {
                 dto.Answers.Add(false);
-            }
-
-            string? qrCodeImage = null;
-            if (dto.Approved)
-            {
-                using (var qrGenerator = new QRCodeGenerator())
-                using (var qrCodeData = qrGenerator.CreateQrCode("Approved", QRCodeGenerator.ECCLevel.Q))
-                using (var qrCode = new QRCode(qrCodeData))
-                using (var qrCodeImageBitmap = qrCode.GetGraphic(20))
-                using (var stream = new MemoryStream())
-                {
-                    qrCodeImageBitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                    qrCodeImage = Convert.ToBase64String(stream.ToArray());
-                }
-            }
+            }         
 
             return new Questionnaire() { 
                 Remark = dto.Remark,
                 Approved = dto.Approved,
-                QRCode = qrCodeImage,
                 RowVersion = dto.RowVersion,
                 ListOfQuestions = questionList.Select((question, index) => new QuestionnaireQuestion
                 {

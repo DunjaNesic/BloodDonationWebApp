@@ -13,6 +13,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
     public interface IQuestionnaireService
     {
         Task<ApiBaseResponse> GetAll(string JMBG, QuestionnaireParameters questionnaireParameters, bool trackChanges);
+        Task<ApiBaseResponse> Get(string JMBG, int actionID);
         Task<ApiBaseResponse> Create(string JMBG, int actionID, CreateQuestionnaireDTO questionnaireDTO);
         Task<ApiBaseResponse> Update(string JMBG, int actionID, UpdateQuestionnaireDTO questionnaireDTO);
     }

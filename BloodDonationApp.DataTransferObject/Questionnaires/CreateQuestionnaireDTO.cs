@@ -10,8 +10,6 @@ namespace BloodDonationApp.DataTransferObject.Questionnaires
     [Serializable]
     public class CreateQuestionnaireDTO
     {
-        public required string JMBG { get; set; }
-        public int ActionID { get; set; }
         public string? QuestionnaireTitle { get; set; }
         public string? Remark { get; set; }
         public DateTime DateOfMaking { get; set; } = DateTime.UtcNow;

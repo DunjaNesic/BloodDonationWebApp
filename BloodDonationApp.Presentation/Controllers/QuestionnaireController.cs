@@ -41,9 +41,22 @@ namespace BloodDonationApp.Presentation.Controllers
             return Ok(questionnaires);
         }
 
+        [HttpGet("{actionID}")]
+        public async Task<ActionResult<GetQuestionnaireDTO>> GetQuestionnaire(string JMBG, int actionID)
+        {
+            var baseResult = await _serviceManager.QuestionnaireService.Get(JMBG, actionID);
+
+            if (!baseResult.Success)
+                return ProcessError(baseResult);
+
+            var questionnaires = baseResult.GetResult<GetQuestionnaireDTO>();
+
+            return Ok(questionnaires);
+        }
+
         [HttpPost("{actionID}")]
         //[ServiceFilter(typeof(ValidationFilterAttribute))]
-        public async Task<ActionResult<GetQuestionnaireDTO>> Create([FromBody] CreateQuestionnaireDTO createdQuestionnaire, string JMBG, int actionID)
+        public async Task<ActionResult<GetQuestionnaireDTO>> Create(string JMBG, int actionID, [FromBody] CreateQuestionnaireDTO createdQuestionnaire)
         {
              var baseResult = await _serviceManager.QuestionnaireService.Create(JMBG, actionID, createdQuestionnaire);
              
@@ -56,7 +69,7 @@ namespace BloodDonationApp.Presentation.Controllers
         }
 
         [HttpPut("{actionID}")]
-        public async Task<ActionResult<GetQuestionnaireDTO>> Update([FromBody] UpdateQuestionnaireDTO updatedQuestionnaire, string JMBG, int actionID)
+        public async Task<ActionResult<GetQuestionnaireDTO>> Update(string JMBG, int actionID, [FromBody] UpdateQuestionnaireDTO updatedQuestionnaire)
         {
             if (!ModelState.IsValid)
             {

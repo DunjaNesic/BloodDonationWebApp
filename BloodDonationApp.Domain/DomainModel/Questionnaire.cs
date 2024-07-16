@@ -22,7 +22,6 @@ namespace BloodDonationApp.Domain.DomainModel
         public DateTime DateOfMaking { get; set; }
         public List<Question>? Questions { get; set; }
         public List<QuestionnaireQuestion>? ListOfQuestions { get; set; }
-        public string? QRCode { get; set; }
         public byte[] RowVersion { get; set; } = Array.Empty<byte>();
     }
 }
