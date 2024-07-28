@@ -15,6 +15,8 @@ using BloodDonationApp.Presentation.ActionFilters;
 using BloodDonationApp.DataTransferObject.Action;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Hosting;
+using BloodDonationApp.Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +38,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
 builder.Services.AddScoped<IDataShaper<GetTransfusionActionDTO>, DataShaper<GetTransfusionActionDTO>>();
 //builder.Services.AddScoped<ValidateMediaTypeAttribute>();
+builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureCors();
 builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureSqlServerContext(builder.Configuration);
@@ -51,7 +54,7 @@ builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.AddControllers(config =>
 {
     config.RespectBrowserAcceptHeader = true;
-    config.ReturnHttpNotAcceptable = true;
+    config.ReturnHttpNotAcceptable = false;
 
     //necemo response cachinggg
     //config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
@@ -61,7 +64,7 @@ builder.Services.AddControllers(config =>
 
 })
     .AddNewtonsoftJson()   
-    .AddXmlDataContractSerializerFormatters()
+    //.AddXmlDataContractSerializerFormatters()
     .AddApplicationPart(typeof(BloodDonationApp.Presentation.AssemblyReference).Assembly);
 
 builder.Services.AddCustomMediaTypes();

@@ -29,7 +29,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         {
             _actionService = new Lazy<IActionService>(() => new ActionService(uow, _logger, _dataShaper));
             _donorService = new Lazy<IDonorService>(() => new DonorService(uow, _logger));
-            _placeService = new Lazy<IPlaceService>(() => new PlaceService(uow));
+            _placeService = new Lazy<IPlaceService>(() => new PlaceService(uow, _logger));
             _questionnaireService = new Lazy<IQuestionnaireService>(() => new QuestionnaireService(uow, _logger));
             _questionService = new Lazy<IQuestionService>(() => new QuestionService(uow));
             _volunteerService = new Lazy<IVolunteerService>(() => new VolunteerService(uow, _logger));

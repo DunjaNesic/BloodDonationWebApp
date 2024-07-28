@@ -67,10 +67,11 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         {
             var shapedObject = new ShapedCustomExpando();
 
-            foreach (var property in requiredProperties) 
+            foreach (var property in requiredProperties)
             {
                 var objPropertyValue = property.GetValue(entity);
-                shapedObject.CustomExpando.Add(property.Name, objPropertyValue);
+                var propertyName = property.Name.Substring(0, 1).ToLower() + property.Name.Substring(1);
+                shapedObject.CustomExpando.Add(propertyName, objPropertyValue);
             }
 
             var idProperty = entity.GetType().GetProperties().FirstOrDefault(p => p.Name.EndsWith("ID"));
@@ -89,6 +90,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         }
 
 
-       
+
     }
 }

@@ -10,37 +10,13 @@ using System.Threading.Tasks;
 
 namespace BloodDonationApp.DataAccessLayer.PlaceRepo
 {
-    public class PlaceRepository : IPlaceRepository
+    public class PlaceRepository : RepositoryBase<Place>, IPlaceRepository
     {
         private readonly BloodDonationContext _context;
-        public PlaceRepository(BloodDonationContext context)
+        public PlaceRepository(BloodDonationContext context) : base(context)
         {
             _context = context;
         }
 
-        public Task CreateAsync(Place t)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Delete(Place t)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IQueryable<Place> GetAll(bool trackChanges, params Expression<Func<Place, object>>[] includes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IQueryable<Place> GetByCondition(Expression<Func<Place, bool>> condition, bool trackChanges, params Expression<Func<Place, object>>[] includes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(Place t)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

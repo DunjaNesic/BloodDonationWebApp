@@ -113,7 +113,9 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
                 }
 
                 string filePath = Path.Combine(directoryPath, $"{JMBG}_{actionID}.png");
+#pragma warning disable CA1416 // Validate platform compatibility
                 qrCodeAsBitmap.Save(filePath, ImageFormat.Png);
+#pragma warning restore CA1416 // Validate platform compatibility
                 //npr https://localhost:7062/qrcodes/0101995700001_3.png
             }
 

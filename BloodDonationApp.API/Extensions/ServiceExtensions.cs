@@ -29,6 +29,9 @@ namespace BloodDonationApp.API.Extensions
                 });
             });
         }
+        public static void ConfigureIISIntegration(this IServiceCollection services) =>
+        services.Configure<IISOptions>(options => {
+        });
         public static void ConfigureLoggerService(this IServiceCollection services) =>
             services.AddSingleton<ILoggerManager, ConsoleLogger>();
         public static void ConfigureSqlServerContext(this IServiceCollection services, IConfiguration configuration) => services.AddDbContext<BloodDonationContext>(options =>
@@ -37,7 +40,6 @@ namespace BloodDonationApp.API.Extensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
         public static void ConfigureServiceManager(this IServiceCollection services) =>
             services.AddScoped<IServiceManager, ServiceManager>();
-
         public static void AddCustomMediaTypes(this IServiceCollection services)
         {
             services.Configure<MvcOptions>(config =>
@@ -66,7 +68,6 @@ namespace BloodDonationApp.API.Extensions
             opt.AddBasePolicy(bp => bp.Expire(TimeSpan.FromSeconds(42)));
             opt.AddPolicy("120SecondsDuration", p => p.Expire(TimeSpan.FromSeconds(120)));
         });
-
         public static void ConfigureRateLimitingOptions(this IServiceCollection services)
         {
             services.AddRateLimiter(opt =>
@@ -104,7 +105,6 @@ namespace BloodDonationApp.API.Extensions
                 };
             });
         }
-
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtSettings = configuration.GetSection("JwtSettings");

@@ -12,10 +12,10 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
 {
     public interface IActionService
     {
-        Task<ApiBaseResponse> Delete(int actionID);
         Task<ApiBaseResponse> GetAll(bool trackChanges, ActionParameters actionParameters);
         Task<ApiBaseResponse> GetAction(int actionID, string fields = "");
         Task<ApiBaseResponse> GetByCondition(Expression<Func<TransfusionAction, bool>> condition, bool trackChanges);
+        Task<ApiBaseResponse> Delete(int actionID);
 
     }
 }
