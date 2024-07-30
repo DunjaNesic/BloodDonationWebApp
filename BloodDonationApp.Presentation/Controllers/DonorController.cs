@@ -1,4 +1,5 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
+using BloodDonationApp.DataTransferObject.Action;
 using BloodDonationApp.DataTransferObject.Donors;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
@@ -65,6 +66,17 @@ namespace BloodDonationApp.Presentation.Controllers
             return Ok(call);
         }
 
+        [HttpGet("{JMBG}/calls")]
+        public async Task<ActionResult<GetTransfusionActionDTO>> GetDonorsNotifications(string JMBG)
+        {
+            var baseResult = await _serviceManager.DonorService.GetByCondition(JMBG);
+            if (!baseResult.Success) return ProcessError(baseResult);
+
+            var notifsBaseRes = await _serviceManager.DonorService.GetDonorsNotifications(JMBG);
+            if (!notifsBaseRes.Success) return ProcessError(notifsBaseRes);
+
+            return Ok(notifsBaseRes.GetResult<IEnumerable<GetTransfusionActionDTO>>());
+        }
 
     }
 }

@@ -22,6 +22,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         private readonly ILoggerManager _logger;
         private readonly DonorMapper _mapper = new DonorMapper();
         private readonly ActionMapper _actionMapper = new ActionMapper();
+        private readonly CallToDonateMapper _callsMapper = new CallToDonateMapper();
         public DonorService(IUnitOfWork unitOfWork, ILoggerManager logger)
         {
             uow = unitOfWork;   
@@ -58,7 +59,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
 
         public async Task<ApiBaseResponse> GetIncomingDonorAction(string jMBG)
         {
-            var actions = await uow.DonorRepository.GetIncomingAction(jMBG);
+            var actions = await uow.DonorRepository.GetIncomingAction(jMBG, false);
 
             if (!actions.Any())
             {
@@ -100,5 +101,16 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             return new ApiOkResponse<string>("wooo");
         }
 
+        public async Task<ApiBaseResponse> GetDonorsNotifications(string JMBG)
+        {
+            var actions = await uow.DonorRepository.GetIncomingAction(JMBG, true);
+
+            if (!actions.Any())
+            {
+                return new ActionNotFoundResponse();
+            }
+            var actionsDTO = actions.Select(a => _actionMapper.ToDto(a)).ToList();
+            return new ApiOkResponse<IEnumerable<GetTransfusionActionDTO>>(actionsDTO);
+        }
     }
 }

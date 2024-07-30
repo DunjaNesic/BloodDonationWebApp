@@ -15,7 +15,7 @@ namespace BloodDonationApp.DataAccessLayer.DonorRepo
         Task<IEnumerable<TransfusionAction>> GetActions(string jMBG);
         IQueryable<Donor> GetAllDonors(bool trackChanges, DonorParameters donorParameters);
         Task<Donor?> GetByJMBG(string JMBG);
-        Task<IEnumerable<TransfusionAction>> GetIncomingAction(string jMBG);
+        Task<IEnumerable<TransfusionAction>> GetIncomingAction(string jMBG, bool forNotifications);
         IQueryable<Donor> GetDonorsByCondition(Expression<Func<Donor, bool>> condition, bool trackChanges);
     }
 }

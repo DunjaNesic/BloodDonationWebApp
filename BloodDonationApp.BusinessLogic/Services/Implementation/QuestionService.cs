@@ -6,6 +6,7 @@ using BloodDonationApp.Domain.ResponsesModel.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,9 +20,11 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             uow = unitOfWork;
         }
 
-        public Task<IQueryable<Question>> GetAll(bool trackChanges)
+        public async Task<ApiBaseResponse> GetAll(bool trackChanges)
         {
-            throw new NotImplementedException();
+            Expression<Func<Question, bool>> condition = question => question.Flag == 0;
+            var questions = await uow.QuestionRepository.GetQuestionsByConditionAsync(condition, false);
+            return new ApiOkResponse<IEnumerable<Question>>(questions);
         }
     }
 }

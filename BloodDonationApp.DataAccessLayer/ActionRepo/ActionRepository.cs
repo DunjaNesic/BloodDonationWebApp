@@ -37,7 +37,7 @@ namespace BloodDonationApp.DataAccessLayer.ActionRepo
         }
         public async Task<TransfusionAction?> GetAction(int actionID)
         {
-            var action = await _context.TransfusionActions.Where(a => a.ActionID == actionID).SingleOrDefaultAsync();
+            var action = await _context.TransfusionActions.Include(a => a.Place).Where(a => a.ActionID == actionID).SingleOrDefaultAsync();
 
             return action;
         }

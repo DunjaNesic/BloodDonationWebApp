@@ -41,6 +41,19 @@ namespace BloodDonationApp.Presentation.Controllers
             return Ok(questionnaires);
         }
 
+        [HttpGet("questions")]
+        public async Task<ActionResult<IEnumerable<Question>>> GetAllQuestions(string JMBG)
+        {
+            var baseResult = await _serviceManager.QuestionService.GetAll(false);
+
+            if (!baseResult.Success)
+                return ProcessError(baseResult);
+
+            var questions = baseResult.GetResult<IEnumerable<Question>>();
+
+            return Ok(questions);
+        }
+
         [HttpGet("{actionID}")]
         public async Task<ActionResult<GetQuestionnaireDTO>> GetQuestionnaire(string JMBG, int actionID)
         {

@@ -81,24 +81,32 @@ namespace BloodDonationApp.DataAccessLayer.DonorRepo
             }
 
             var actions = await _context.TransfusionActions
+                .Include(a => a.Place)
                 .Where(a => actionIds.Contains(a.ActionID))
                 .ToListAsync();
 
             return actions;
         }
 
-        public async Task<IEnumerable<TransfusionAction>> GetIncomingAction(string jMBG)
+        public async Task<IEnumerable<TransfusionAction>> GetIncomingAction(string jMBG, bool forNotifications)
         {
             var donor = await _context.Donors
-                .Include(d => d.CallsToDonate)
-                .FirstOrDefaultAsync(d => d.JMBG == jMBG);
+            .Include(d => d.CallsToDonate)
+            .Include(d => d.Place)
+            .FirstOrDefaultAsync(d => d.JMBG == jMBG);
 
             if (donor == null || donor.CallsToDonate == null || !donor.CallsToDonate.Any())
             {
                 return Enumerable.Empty<TransfusionAction>();
             }
 
-            var calls = donor.CallsToDonate.Where(ctd => ctd.AcceptedTheCall == true);
+            IEnumerable<CallToDonate> calls;
+
+            if (forNotifications)
+            calls = donor.CallsToDonate.Where(ctd => ctd.AcceptedTheCall == false);
+
+            else calls = donor.CallsToDonate.Where(ctd => ctd.AcceptedTheCall == true);
+            
 
             var actionIds = calls.Select(ctd => ctd.ActionID).ToList();
 
@@ -107,9 +115,16 @@ namespace BloodDonationApp.DataAccessLayer.DonorRepo
                 return Enumerable.Empty<TransfusionAction>();
             }
 
+            var cetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+
+            var nowUtc = DateTime.UtcNow;
+            var nowCET = TimeZoneInfo.ConvertTimeFromUtc(nowUtc, cetTimeZone);
+
             var actions = await _context.TransfusionActions
-                .Where(a => actionIds.Contains(a.ActionID) && a.ActionDate > DateTime.UtcNow )
+                .Include(a => a.Place)
+                .Where(a => actionIds.Contains(a.ActionID) && a.ActionDate >= nowCET)
                 .ToListAsync();
+
 
             return actions;
         }

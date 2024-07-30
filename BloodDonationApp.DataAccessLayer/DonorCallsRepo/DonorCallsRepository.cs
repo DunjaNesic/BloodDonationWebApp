@@ -34,5 +34,6 @@ namespace BloodDonationApp.DataAccessLayer.DonorCallsRepo
             var call = await GetByCondition((c => c.JMBG.Equals(JMBG) && c.ActionID == actionID), trackChanges).SingleOrDefaultAsync();
             return call;
         }
+
     }
 }

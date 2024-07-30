@@ -17,7 +17,8 @@ namespace BloodDonationApp.DataTransferObject.Mappers
             ActionName = action.ActionName,
             ActionDate = action.ActionDate, 
             ExactLocation = action.ExactLocation,
-            ActionTimeFromTo = action?.ActionTimeFromTo ?? "Nepoznato je vreme odrzavanja akcije"
+            ActionTimeFromTo = action?.ActionTimeFromTo ?? "Nepoznato je vreme odrzavanja akcije",
+            PlaceName = action?.Place.PlaceName ?? "Nepoznat je grad u kom se odrzava akcija"
         };
         public TransfusionAction FromDto(GetTransfusionActionDTO action)
         {

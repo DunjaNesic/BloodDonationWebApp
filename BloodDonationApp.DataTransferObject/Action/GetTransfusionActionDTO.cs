@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BloodDonationApp.Domain.DomainModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,6 @@ namespace BloodDonationApp.DataTransferObject.Action
         public DateTime ActionDate { get; set; }
         public string ActionTimeFromTo { get; set; } = string.Empty;
         public string? ExactLocation { get; set; }
+        public string? PlaceName { get; set; }
     }
 }
