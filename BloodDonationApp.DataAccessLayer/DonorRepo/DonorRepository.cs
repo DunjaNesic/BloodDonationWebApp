@@ -128,5 +128,36 @@ namespace BloodDonationApp.DataAccessLayer.DonorRepo
 
             return actions;
         }
+
+        public async Task<IEnumerable<TransfusionAction>> GetDonorsHistory(string JMBG)
+        {
+            var donor = await _context.Donors
+            .Include(d => d.CallsToDonate)
+            .Include(d => d.Place)
+            .FirstOrDefaultAsync(d => d.JMBG == JMBG);
+
+            if (donor == null || donor.CallsToDonate == null || !donor.CallsToDonate.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
+
+
+            var calls = donor.CallsToDonate.Where(ctd => ctd.ShowedUp == true);
+
+            var actionIds = calls.Select(ctd => ctd.ActionID).ToList();
+
+            if (actionIds == null || !actionIds.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
+
+            var actions = await _context.TransfusionActions
+                .Include(a => a.Place)
+                .Include(a => a.ListOfQuestionnaires)
+                .Where(a => actionIds.Contains(a.ActionID))
+                .ToListAsync();
+
+            return actions;
+        }
     }
 }

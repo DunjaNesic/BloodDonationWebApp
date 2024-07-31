@@ -101,16 +101,55 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             return new ApiOkResponse<string>("wooo");
         }
 
-        public async Task<ApiBaseResponse> GetDonorsNotifications(string JMBG)
+        public async Task<ApiBaseResponse> GetDonorsNotifications(string JMBG, bool history)
         {
-            var actions = await uow.DonorRepository.GetIncomingAction(JMBG, true);
+            IEnumerable<TransfusionAction> actions;
 
+            if (!history)
+            {
+                actions = await uow.DonorRepository.GetIncomingAction(JMBG, true);
+            }
+            else {
+                actions = await uow.DonorRepository.GetDonorsHistory(JMBG);
+            }
             if (!actions.Any())
             {
                 return new ActionNotFoundResponse();
             }
             var actionsDTO = actions.Select(a => _actionMapper.ToDto(a)).ToList();
             return new ApiOkResponse<IEnumerable<GetTransfusionActionDTO>>(actionsDTO);
+        }
+
+        public async Task<ApiBaseResponse> GetDonorStats(string JMBG)
+        {
+            var allCalls = await uow.DonorCallsRepository.GetAllCalls(JMBG);
+            if (!allCalls.Any())
+            {
+                return new DonorNotFoundResponse();
+            }
+
+            var acceptedAndAttendedCalls = await uow.DonorCallsRepository.GetAACalls(JMBG);
+            var acceptedButNotAttendedCalls = await uow.DonorCallsRepository.GetADCalls(JMBG);
+            var declinedAndNotAttendedCalls = await uow.DonorCallsRepository.GetDDCalls(JMBG);
+            var declinedButAttendedCalls = await uow.DonorCallsRepository.GetDACalls(JMBG);
+
+            int totalActions = allCalls.Count();
+            int acceptedAndAttended = acceptedAndAttendedCalls.Count();
+            int acceptedButNotAttended = acceptedButNotAttendedCalls.Count();
+            int declinedAndNotAttended = declinedAndNotAttendedCalls.Count();
+            int declinedButAttended = declinedButAttendedCalls.Count();
+
+            DonorStatisticsDTO donorStats = new DonorStatisticsDTO
+            {
+                JMBG = JMBG,
+                TotalActions = totalActions,
+                AcceptedAndAttendedPercentage = (double)acceptedAndAttended / totalActions * 100,
+                AcceptedButDidNotAttendPercentage = (double)acceptedButNotAttended / totalActions * 100,
+                DeclinedAndDidNotAttendPercentage = (double)declinedAndNotAttended / totalActions * 100,
+                DeclinedButAttendedPercentage = (double)declinedButAttended / totalActions * 100,
+            };
+
+            return new ApiOkResponse<DonorStatisticsDTO>(donorStats);
         }
     }
 }

@@ -66,16 +66,32 @@ namespace BloodDonationApp.Presentation.Controllers
             return Ok(call);
         }
 
-        [HttpGet("{JMBG}/calls")]
-        public async Task<ActionResult<GetTransfusionActionDTO>> GetDonorsNotifications(string JMBG)
+        [HttpGet("{JMBG}/calls/{history}")]
+        public async Task<ActionResult<GetTransfusionActionDTO>> GetDonorsNotifications(string JMBG, bool history)
         {
             var baseResult = await _serviceManager.DonorService.GetByCondition(JMBG);
             if (!baseResult.Success) return ProcessError(baseResult);
 
-            var notifsBaseRes = await _serviceManager.DonorService.GetDonorsNotifications(JMBG);
+            var notifsBaseRes = await _serviceManager.DonorService.GetDonorsNotifications(JMBG, history);
             if (!notifsBaseRes.Success) return ProcessError(notifsBaseRes);
 
             return Ok(notifsBaseRes.GetResult<IEnumerable<GetTransfusionActionDTO>>());
+        }
+
+        [HttpGet("{JMBG}/stats")]
+        public async Task<ActionResult<DonorStatisticsDTO>> GetDonorStatistics(string JMBG)
+        {
+            var baseResult = await _serviceManager.DonorService.GetByCondition(JMBG);
+            if (!baseResult.Success) return ProcessError(baseResult);
+
+            var foundDonor = baseResult.GetResult<GetDonorDTO>();
+
+            var baseResultStats = await _serviceManager.DonorService.GetDonorStats(foundDonor.JMBG);
+            if (!baseResultStats.Success) return ProcessError(baseResultStats);
+
+            var stats = baseResultStats.GetResult<DonorStatisticsDTO>();
+
+            return Ok(stats);
         }
 
     }
