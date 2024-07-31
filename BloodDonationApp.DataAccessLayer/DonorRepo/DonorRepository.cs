@@ -159,5 +159,10 @@ namespace BloodDonationApp.DataAccessLayer.DonorRepo
 
             return actions;
         }
+
+        public async Task CreateDonor(Donor donor)
+        {        
+            await CreateAsync(donor);
+        }
     }
 }

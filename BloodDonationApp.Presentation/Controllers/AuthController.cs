@@ -54,5 +54,23 @@ namespace BloodDonationApp.Presentation.Controllers
             return Ok();
         }
 
+        [HttpPost("/register")]
+        public async Task<IActionResult> Register([FromBody] UserRegistrationDTO registrationDTO)
+        {
+            if (registrationDTO == null || !ModelState.IsValid)
+            {
+                return BadRequest("Invalid registration details.");
+            }
+
+            var result = await _serviceManager.AuthenticationService.RegisterUser(registrationDTO);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+
     }
 }

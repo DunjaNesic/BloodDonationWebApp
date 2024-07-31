@@ -1,7 +1,11 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
+using BloodDonationApp.DataAccessLayer.BaseRepository;
 using BloodDonationApp.DataAccessLayer.UnitOfWork;
 using BloodDonationApp.DataTransferObject.Users;
 using BloodDonationApp.Domain.DomainModel;
+using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
+using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Donor;
+using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -23,11 +27,51 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             user = new User();
             _uow = uow;
             _logger = logger;
-            _configuration = configuration;     
+            _configuration = configuration;
         }
-        public Task RegisterUser(User userForRegistration)
+        public async Task<ApiBaseResponse> RegisterUser(UserRegistrationDTO registrationDTO)
         {
-            throw new NotImplementedException();
+            var existingUser = await _uow.UserRepository.FindByEmailAsync(registrationDTO.Email);
+            if (existingUser != null)
+            {
+                return new ApiOkResponse<string>("Email is already in use.");
+            }
+
+            var user = new User
+            {
+                Email = registrationDTO.Email,
+                Password = BCrypt.Net.BCrypt.HashPassword(registrationDTO.Password),
+            };
+
+            var role = await _uow.UserRepository.FindRoleAsync("donor-role");
+            if (role != null)
+            {
+                user.Roles.Add(role);
+            }
+            else
+            {
+                return new ApiOkResponse<string>("Role does not exist.");
+            }
+
+            await _uow.UserRepository.CreateUser(user);
+            await _uow.SaveChanges(); 
+
+            var donor = new Donor
+            {
+                JMBG = registrationDTO.JMBG,
+                DonorFullName = registrationDTO.DonorFullName,
+                Sex = registrationDTO.Sex,
+                BloodType = registrationDTO.BloodType,
+                IsActive = registrationDTO.IsActive,
+                LastDonationDate = registrationDTO.LastDonationDate,
+                PlaceID = registrationDTO.PlaceID,
+                UserID = user.UserID 
+            };
+
+            await _uow.DonorRepository.CreateDonor(donor);
+            await _uow.SaveChanges(); 
+
+            return new ApiOkResponse<string>("Registration successful");
         }
 
         public async Task<bool> ValidateUser(UserLoginDTO userForLogin)

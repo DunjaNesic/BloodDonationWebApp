@@ -12,6 +12,7 @@ namespace BloodDonationApp.DataAccessLayer.DonorRepo
 {
     public interface IDonorRepository : IRepository<Donor>
     {
+        Task CreateDonor(Donor donor);
         Task<IEnumerable<TransfusionAction>> GetActions(string jMBG);
         IQueryable<Donor> GetAllDonors(bool trackChanges, DonorParameters donorParameters);
         Task<Donor?> GetByJMBG(string JMBG);

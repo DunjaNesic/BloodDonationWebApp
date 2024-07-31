@@ -51,5 +51,15 @@ namespace BloodDonationApp.DataAccessLayer.UserRepo
 
             return user.Roles.Select(r => r.RoleName).ToList();
         }
+
+        public async Task<Role?> FindRoleAsync(string roleName)
+        {
+            return await _context.Roles.SingleOrDefaultAsync(r => r.RoleID == roleName);
+        }
+
+        public async Task CreateUser(User user)
+        {
+            await CreateAsync(user);
+        }
     }
 }
