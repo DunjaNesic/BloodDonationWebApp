@@ -1,4 +1,5 @@
-﻿using BloodDonationApp.Domain.DomainModel;
+﻿using BloodDonationApp.DataTransferObject.Action;
+using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using Common.RequestFeatures;
 using System;
@@ -16,6 +17,8 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
         Task<ApiBaseResponse> GetAction(int actionID, string fields = "");
         Task<ApiBaseResponse> GetByCondition(Expression<Func<TransfusionAction, bool>> condition, bool trackChanges);
         Task<ApiBaseResponse> Delete(int actionID);
+        Task<ApiBaseResponse> CreateAction(CreateTransfusionActionDTO action);
+        Task<ApiBaseResponse> GetActionStats(int actionID);
 
     }
 }

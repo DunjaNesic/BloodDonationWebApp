@@ -26,7 +26,6 @@ namespace BloodDonationApp.DataTransferObject.Users
         public Sex Sex { get; set; }
         public BloodType BloodType { get; set; }
         public bool IsActive { get; set; }
-        public DateTime LastDonationDate { get; set; }
         public int PlaceID { get; set; }
 
     }

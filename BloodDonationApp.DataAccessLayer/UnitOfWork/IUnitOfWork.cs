@@ -1,6 +1,7 @@
 ﻿using BloodDonationApp.DataAccessLayer.ActionRepo;
 using BloodDonationApp.DataAccessLayer.DonorCallsRepo;
 using BloodDonationApp.DataAccessLayer.DonorRepo;
+using BloodDonationApp.DataAccessLayer.OfficialRepo;
 using BloodDonationApp.DataAccessLayer.PlaceRepo;
 using BloodDonationApp.DataAccessLayer.QuestionnaireRepo;
 using BloodDonationApp.DataAccessLayer.QuestionRepo;
@@ -28,6 +29,7 @@ namespace BloodDonationApp.DataAccessLayer.UnitOfWork
         IDonorCallsRepository DonorCallsRepository { get; }
         IVolCallsRepository VolunteerCallsRepository { get; }
         IUserRepository UserRepository { get; }
+        IOfficialRepository OfficialRepository { get; }
         Task SaveChanges();
     }
 }

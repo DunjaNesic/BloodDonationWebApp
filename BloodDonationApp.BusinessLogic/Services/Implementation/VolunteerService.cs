@@ -78,7 +78,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
 
         public async Task<ApiBaseResponse> GetIncomingVolunteerAction(int volunteerID)
         {
-            var actions = await uow.VolunteerRepository.GetIncomingAction(volunteerID);
+            var actions = await uow.VolunteerRepository.GetIncomingAction(volunteerID, false);
 
             if (!actions.Any())
             {
@@ -113,11 +113,68 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             var call = await uow.VolunteerCallsRepository.GetCall(volunteerID, actionID, true);
             if (call == null) return new VolunteerNotFoundResponse();
 
+            if (call.AcceptedTheCall == true && call.ShowedUp == false && volunteerCall.AcceptedTheCall == true && volunteerCall.ShowedUp == false) {
+                return new ApiOkResponse<string>("Vec ste prijavljeni na ovu akciju");
+            }
+
             call.AcceptedTheCall = volunteerCall.AcceptedTheCall;
             call.ShowedUp = volunteerCall.ShowedUp;
 
             await uow.SaveChanges();
-            return new ApiOkResponse<string>("wooo");
+            return new ApiOkResponse<string>("Uspesno azuriran poziv na akciju");
+        }
+
+        public async Task<ApiBaseResponse> GetVolunteersNotifications(int volunteerID, bool history)
+        {
+            IEnumerable<TransfusionAction> actions;
+
+            if (!history)
+            {
+                actions = await uow.VolunteerRepository.GetIncomingAction(volunteerID, true);
+            }
+            else
+            {
+                actions = await uow.VolunteerRepository.GetVolunteersHistory(volunteerID);
+            }
+            if (!actions.Any())
+            {
+                return new ActionNotFoundResponse();
+            }
+            var actionsDTO = actions.Select(a => _actionMapper.ToDto(a)).ToList();
+            return new ApiOkResponse<IEnumerable<GetTransfusionActionDTO>>(actionsDTO);
+        }
+
+        public async Task<ApiBaseResponse> GetVolunteerStats(GetVolunteerDTO foundVolunteer)
+        {
+            var allCalls = await uow.VolunteerCallsRepository.GetAllCalls(foundVolunteer.VolunteerID);
+            if (!allCalls.Any())
+            {
+                return new VolunteerNotFoundResponse();
+            }
+
+            var acceptedAndAttendedCalls = await uow.VolunteerCallsRepository.GetAACalls(foundVolunteer.VolunteerID);
+            var acceptedButNotAttendedCalls = await uow.VolunteerCallsRepository.GetADCalls(foundVolunteer.VolunteerID);
+            var declinedAndNotAttendedCalls = await uow.VolunteerCallsRepository.GetDDCalls(foundVolunteer.VolunteerID);
+            var declinedButAttendedCalls = await uow.VolunteerCallsRepository.GetDACalls(foundVolunteer.VolunteerID);
+
+            int totalActions = allCalls.Count();
+            int acceptedAndAttended = acceptedAndAttendedCalls.Count();
+            int acceptedButNotAttended = acceptedButNotAttendedCalls.Count();
+            int declinedAndNotAttended = declinedAndNotAttendedCalls.Count();
+            int declinedButAttended = declinedButAttendedCalls.Count();
+
+            VolunteerStatisticsDTO volunteerStats = new VolunteerStatisticsDTO
+            {
+                VolunteerID = foundVolunteer.VolunteerID,
+                FullName = foundVolunteer.VolunteerFullName,
+                TotalActions = totalActions,
+                AcceptedAndAttendedPercentage = (double)acceptedAndAttended / totalActions * 100,
+                AcceptedButDidNotAttendPercentage = (double)acceptedButNotAttended / totalActions * 100,
+                DeclinedAndDidNotAttendPercentage = (double)declinedAndNotAttended / totalActions * 100,
+                DeclinedButAttendedPercentage = (double)declinedButAttended / totalActions * 100,
+            };
+
+            return new ApiOkResponse<VolunteerStatisticsDTO>(volunteerStats);
         }
     }
 }

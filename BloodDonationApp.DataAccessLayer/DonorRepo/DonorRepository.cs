@@ -122,7 +122,7 @@ namespace BloodDonationApp.DataAccessLayer.DonorRepo
 
             var actions = await _context.TransfusionActions
                 .Include(a => a.Place)
-                .Where(a => actionIds.Contains(a.ActionID) && a.ActionDate >= nowCET)
+                .Where(a => actionIds.Contains(a.ActionID) && a.ActionDate.Date >= nowCET.Date)
                 .ToListAsync();
 
 

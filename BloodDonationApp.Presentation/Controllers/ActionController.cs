@@ -1,6 +1,7 @@
 ﻿using BloodDonationApp.BusinessLogic.Services.Contracts;
 using BloodDonationApp.DataTransferObject.Action;
 using BloodDonationApp.DataTransferObject.Donors;
+using BloodDonationApp.DataTransferObject.Questionnaires;
 using BloodDonationApp.DataTransferObject.Volunteers;
 using BloodDonationApp.Domain.CustomModel;
 using BloodDonationApp.Domain.DomainModel;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Net.Http.Headers;
+using System;
 using System.Dynamic;
 using System.Linq.Expressions;
 
@@ -27,7 +29,7 @@ namespace BloodDonationApp.Presentation.Controllers
 
     [ApiController]
     //[ResponseCache(CacheProfileName = "120SecondsDuration")] 
-    [OutputCache(PolicyName = "120SecondsDuration")]
+    //[OutputCache(PolicyName = "120SecondsDuration")]
     [EnableRateLimiting("SpecificActionsPolicy")]
     [Route("itk/actions")]
     public class ActionController : ApiBaseController
@@ -172,6 +174,30 @@ namespace BloodDonationApp.Presentation.Controllers
                     return BadRequest("Invalid userType");
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAction([FromBody] CreateTransfusionActionDTO action) {
+            var baseResult = await _serviceManager.ActionService.CreateAction(action);
+
+            if (!baseResult.Success)
+                return ProcessError(baseResult);
+
+            var actions = baseResult.GetResult<CreateTransfusionActionDTO>();
+
+            return Ok(actions);
+        }
+
+        [HttpGet("stats/{actionID}")]
+        public async Task<IActionResult> GetActionStats(int actionID)
+        {
+            var result = await _serviceManager.ActionService.GetActionStats(actionID);
+
+            if (!result.Success)
+                return ProcessError(result);
+
+            return Ok(result.GetResult<GetActionDetailsDTO>());
+        }
+
 
         private IEnumerable<Link> CreateLinksForAction(int id, string fields = "")
         {

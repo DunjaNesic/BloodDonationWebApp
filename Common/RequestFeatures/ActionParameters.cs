@@ -8,7 +8,7 @@ namespace Common.RequestFeatures
 {
     public class ActionParameters : RequestParameters
     {
-        public DateTime? MinDate { get; set; } = DateTime.MinValue;
+        public DateTime? MinDate { get; set; } = DateTime.UtcNow.Date;
         public DateTime? MaxDate { get; set; } = DateTime.MaxValue;
         public string? Search { get; set; }
     }

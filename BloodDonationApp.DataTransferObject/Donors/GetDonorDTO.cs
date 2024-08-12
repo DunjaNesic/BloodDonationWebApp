@@ -13,11 +13,10 @@ namespace BloodDonationApp.DataTransferObject.Donors
     {
         public string JMBG { get; set; } = string.Empty;
         public string DonorFullName { get; set; } = string.Empty;
-        public string DonorEmailAddress { get; set; } = string.Empty;
         public BloodType BloodType { get; set; }
         public string PlaceName { get; set; } = string.Empty;
         public bool IsActive { get; set; }
-        public DateTime LastDonationDate { get; set; }
+        public DateTime? LastDonationDate { get; set; }
         public List<CallsToDonorDTO>? CallsToDonate { get; set; }
 
 

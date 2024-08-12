@@ -45,7 +45,7 @@ builder.Services.ConfigureSqlServerContext(builder.Configuration);
 builder.Services.ConfigureUnitOfWork();
 builder.Services.ConfigureServiceManager();
 //builder.Services.ConfigureResponseCaching();
-builder.Services.ConfigureOutputCaching();
+//builder.Services.ConfigureOutputCaching();
 builder.Services.ConfigureRateLimitingOptions();
 builder.Services.AddAuthentication();
 builder.Services.ConfigureJWT(builder.Configuration);
@@ -80,8 +80,9 @@ var app = builder.Build();
 
 //var logger = app.Services.GetRequiredService<ILoggerManager>();
 //app.ConfigureExceptionHandler(logger);
-//if (app.Environment.IsProduction())
-//    app.UseHsts();
+
+if (app.Environment.IsProduction())
+    app.UseHsts();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -90,7 +91,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -101,7 +102,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 app.UseRateLimiter();
 app.UseCors("CorsPolicy");
 //app.UseResponseCaching();
-app.UseOutputCache();
+//app.UseOutputCache();
 
 app.UseAuthentication();
 app.UseAuthorization();

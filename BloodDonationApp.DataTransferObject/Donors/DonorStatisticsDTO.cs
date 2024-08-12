@@ -9,6 +9,7 @@ namespace BloodDonationApp.DataTransferObject.Donors
     public class DonorStatisticsDTO
     {
         public string JMBG { get; set; } = string.Empty;
+        public string? FullName { get; set; }
         public int TotalActions { get; set; } 
         public double AcceptedAndAttendedPercentage { get; set; } 
         public double AcceptedButDidNotAttendPercentage { get; set; } 

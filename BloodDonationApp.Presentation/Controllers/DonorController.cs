@@ -86,7 +86,7 @@ namespace BloodDonationApp.Presentation.Controllers
 
             var foundDonor = baseResult.GetResult<GetDonorDTO>();
 
-            var baseResultStats = await _serviceManager.DonorService.GetDonorStats(foundDonor.JMBG);
+            var baseResultStats = await _serviceManager.DonorService.GetDonorStats(foundDonor);
             if (!baseResultStats.Success) return ProcessError(baseResultStats);
 
             var stats = baseResultStats.GetResult<DonorStatisticsDTO>();

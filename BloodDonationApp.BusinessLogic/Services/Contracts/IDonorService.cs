@@ -1,4 +1,5 @@
 ﻿using BloodDonationApp.DataTransferObject.Donors;
+using BloodDonationApp.DataTransferObject.Volunteers;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using Common.RequestFeatures;
@@ -20,6 +21,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
         Task<ApiBaseResponse> CallDonor(string JMBG, int actionID);
         Task<ApiBaseResponse> UpdateCallToDonor(string JMBG, int actionID, CallsToDonorDTO donorCall);
         Task<ApiBaseResponse> GetDonorsNotifications(string JMBG, bool history);
-        Task<ApiBaseResponse> GetDonorStats(string jMBG);
+        Task<ApiBaseResponse> GetDonorStats(GetDonorDTO donor);
     }
 }

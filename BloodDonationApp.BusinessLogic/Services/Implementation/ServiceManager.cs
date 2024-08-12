@@ -23,7 +23,8 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         private readonly Lazy<IQuestionnaireService> _questionnaireService;
         private readonly Lazy<IQuestionService> _questionService;
         private readonly Lazy<IVolunteerService> _volunteerService;
-        private readonly Lazy<IAuthenticationService> _authenticationService;   
+        private readonly Lazy<IAuthenticationService> _authenticationService;
+        private readonly Lazy<IOfficialService> _officialService;
 
         public ServiceManager(IUnitOfWork uow, ILoggerManager _logger, IDataShaper<GetTransfusionActionDTO> _dataShaper, IConfiguration _configuration )
         {
@@ -34,6 +35,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             _questionService = new Lazy<IQuestionService>(() => new QuestionService(uow));
             _volunteerService = new Lazy<IVolunteerService>(() => new VolunteerService(uow, _logger));
             _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(uow, _logger, _configuration));
+            _officialService = new Lazy<IOfficialService>(() => new OfficialService(uow, _logger));
         }
 
         public IActionService ActionService => _actionService.Value;
@@ -43,5 +45,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
         public IQuestionService QuestionService => _questionService.Value;
         public IVolunteerService VolunteerService => _volunteerService.Value;
         public IAuthenticationService AuthenticationService => _authenticationService.Value;
+        public IOfficialService OfficialService => _officialService.Value;
     }
 }

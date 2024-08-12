@@ -15,6 +15,7 @@ namespace BloodDonationApp.DataAccessLayer.ActionRepo
         IQueryable<TransfusionAction> GetAllActions(bool trackChanges, ActionParameters actionParameters);
         Task<TransfusionAction?> GetAction(int actionID);
         IQueryable<TransfusionAction> GetActionsByCondition(Expression<Func<TransfusionAction, bool>> condition, bool trackChanges);
-
+        Task CreateAction(TransfusionAction action);
+        Task<TransfusionAction?> GetActionWithDetails(int actionID);
     }
 }

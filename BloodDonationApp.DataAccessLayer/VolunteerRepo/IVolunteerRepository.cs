@@ -16,6 +16,7 @@ namespace BloodDonationApp.DataAccessLayer.VolunteerRepo
         IQueryable<Volunteer> GetAllVolunteers(bool trackChanges, VolunteerParameters volunteerParameters);
         IQueryable<Volunteer> GetVolunteersByCondition(Expression<Func<Volunteer, bool>> condition, bool trackChanges);
         Task<IEnumerable<TransfusionAction>> GetActions(int volunteerID);
-        Task<IEnumerable<TransfusionAction>> GetIncomingAction(int volunteerID);
+        Task<IEnumerable<TransfusionAction>> GetIncomingAction(int volunteerID, bool forNotifications);
+        Task<IEnumerable<TransfusionAction>> GetVolunteersHistory(int volunteerID);
     }
 }

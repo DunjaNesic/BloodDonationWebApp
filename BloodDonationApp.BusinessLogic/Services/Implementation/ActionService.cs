@@ -6,6 +6,7 @@ using BloodDonationApp.Domain.CustomModel;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Action;
+using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Official;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
 using Common.RequestFeatures;
@@ -69,5 +70,68 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             if (actionsDTO.IsNullOrEmpty()) return new ActionNotFoundResponse();
             return new ApiOkResponse<IEnumerable<GetTransfusionActionDTO>>(actionsDTO);
         }
+
+        public async Task<ApiBaseResponse> CreateAction(CreateTransfusionActionDTO actionDTO)
+        {
+            var official = await uow.OfficialRepository.GetOfficial(actionDTO.OfficialID);
+            if (official == null) return new OfficialNotFoundResponse();
+
+            var volunteers =  uow.VolunteerRepository.GetByCondition(v => actionDTO.ListOfVolunteerIDs.Contains(v.VolunteerID), true).ToList();
+            var donors = uow.DonorRepository.GetByCondition(d => actionDTO.ListOfDonorIDs.Contains(d.JMBG), true).ToList();
+            var officials = uow.OfficialRepository.GetByCondition(o => actionDTO.ListOfActionOfficialIDs.Contains(o.OfficialID), true).ToList();
+
+            var action = _mapper.FromDto(actionDTO);
+
+            action.ActionCoordinator = official;
+            action.ListOfVolunteers = volunteers;
+            action.ListOfActionOfficials = officials;
+
+            foreach (var donor in donors)
+            {
+                var callToDonate = new CallToDonate
+                {
+                    JMBG = donor.JMBG,
+                    Donor = donor,
+                    ActionID = action.ActionID,
+                    Action = action,
+                    AcceptedTheCall = false,
+                    ShowedUp = false
+                };
+
+                action.ListOfCallsToDonors.Add(callToDonate);
+            }
+
+
+            await uow.ActionRepository.CreateAction(action);
+            await uow.SaveChanges();
+
+            var actionToReturn = _mapper.ToDtoCreate(action);
+            return new ApiOkResponse<CreateTransfusionActionDTO>(actionToReturn);
+
+        }
+
+        public async Task<ApiBaseResponse> GetActionStats(int actionID)
+        {
+            _logger.LogInformation("GetActionStats from ActionService");
+
+            var action = await uow.ActionRepository.GetActionWithDetails(actionID);
+            if (action == null)
+                return new ActionNotFoundResponse();
+
+            var actionDetails = new GetActionDetailsDTO
+            {
+                NumberOfAssignedOfficials = action.ListOfActionOfficials?.Count ?? 0,
+                NumberOfVolunteers = action.ListOfCallsToVolunteers?.Count ?? 0,
+                NumberOfDonors = action.ListOfCallsToDonors?.Count ?? 0,
+                MaleDonors = action.ListOfCallsToDonors?.Count(d => d.Donor.Sex == Sex.Musko) ?? 0,
+                FemaleDonors = action.ListOfCallsToDonors?.Count(d => d.Donor.Sex == Sex.Zensko) ?? 0,
+                NewDonors = action.ListOfCallsToDonors?.Count(d => d.Donor.LastDonationDate == null) ?? 0,
+                OldDonors = action.ListOfCallsToDonors?.Count(d => d.Donor.LastDonationDate != null) ?? 0,
+                TimeIntervals = action.ListOfQuestionnaires?.Select(q => q.DateOfMaking).ToArray() ?? new DateTime[0]
+            };
+
+            return new ApiOkResponse<GetActionDetailsDTO>(actionDetails);
+        }
+
     }
 }

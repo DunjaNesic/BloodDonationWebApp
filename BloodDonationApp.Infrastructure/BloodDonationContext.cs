@@ -161,7 +161,8 @@ namespace BloodDonationApp.Infrastructure
                 new User { UserID = 18, Email = "vasilije.nesic@gmail.com", Password = HashPassword("vasa") },
                 new User { UserID = 19, Email = "vojin.cvetkovic@gmail.com", Password = HashPassword("vojin") },
                 new User { UserID = 20, Email = "veljko.cvetkovic@gmail.com", Password = HashPassword("vasa") },
-                new User { UserID = 21, Email = "nikola.miletic@gmail.com", Password = HashPassword("nikola") }
+                new User { UserID = 21, Email = "nikola.miletic@gmail.com", Password = HashPassword("nikola") },
+                new User { UserID = 22, Email = "milos.ninkovic@gmail.com", Password = HashPassword("iva") }
             );
 
 
@@ -206,9 +207,10 @@ namespace BloodDonationApp.Infrastructure
 
             modelBuilder.Entity<Volunteer>().HasData(
                 new Volunteer { VolunteerID = 1,  VolunteerFullName = "Iva Djokovic", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 10, 22), DateFreeTo = new DateTime(2024, 11, 10), DateOfBirth = new DateTime(2001, 4, 29), RedCrossID = 2, UserID = 9 },
-                new Volunteer { VolunteerID = 2,  VolunteerFullName = "Nevena Dukic", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 5, 1), DateFreeTo = new DateTime(2024, 7, 11), DateOfBirth = new DateTime(2001, 7, 15), RedCrossID = 2, UserID = 10 },
-                new Volunteer { VolunteerID = 3,  VolunteerFullName = "Predrag Tanaskovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 3, 5), DateFreeTo = new DateTime(2024, 6, 8), DateOfBirth = new DateTime(2001, 1, 13), RedCrossID = 1, UserID = 14},
-                new Volunteer { VolunteerID = 4,  VolunteerFullName = "Veljko Nedeljkovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 3, 3), DateFreeTo = new DateTime(2024, 5, 9), DateOfBirth = new DateTime(2001, 6, 6), RedCrossID = 1, UserID = 15},
+                new Volunteer { VolunteerID = 2, VolunteerFullName = "Milos Ninkovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 10, 22), DateFreeTo = new DateTime(2024, 11, 10), DateOfBirth = new DateTime(1999, 4, 4), RedCrossID = 2, UserID = 22 },
+                new Volunteer { VolunteerID = 3,  VolunteerFullName = "Nevena Dukic", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 5, 1), DateFreeTo = new DateTime(2024, 7, 11), DateOfBirth = new DateTime(2001, 7, 15), RedCrossID = 2, UserID = 10 },
+                new Volunteer { VolunteerID = 4,  VolunteerFullName = "Predrag Tanaskovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 3, 5), DateFreeTo = new DateTime(2024, 6, 8), DateOfBirth = new DateTime(2001, 1, 13), RedCrossID = 1, UserID = 14},
+                new Volunteer { VolunteerID = 5,  VolunteerFullName = "Veljko Nedeljkovic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 3, 3), DateFreeTo = new DateTime(2024, 5, 9), DateOfBirth = new DateTime(2001, 6, 6), RedCrossID = 1, UserID = 15},
                 new Volunteer { VolunteerID = 6,  VolunteerFullName = "Minja Filip", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 3, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(2001, 9, 24), RedCrossID = 1, UserID = 16},
                 new Volunteer { VolunteerID = 7,  VolunteerFullName = "Sofija Filip", Sex = Sex.Zensko, DateFreeFrom = new DateTime(2024, 2, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(2001, 9, 24), RedCrossID = 1, UserID = 17},
                 new Volunteer { VolunteerID = 8, VolunteerFullName = "Vasilije Nesic", Sex = Sex.Musko, DateFreeFrom = new DateTime(2024, 2, 10), DateFreeTo = new DateTime(2024, 4, 10), DateOfBirth = new DateTime(2002, 5, 12), RedCrossID = 2, UserID = 18 },

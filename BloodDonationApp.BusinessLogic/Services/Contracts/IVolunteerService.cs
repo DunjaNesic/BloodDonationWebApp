@@ -20,5 +20,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
         Task<ApiBaseResponse> GetIncomingVolunteerAction(int volunteerID);
         Task<ApiBaseResponse> CallVolunteer(int volunteerID, int actionID);
         Task<ApiBaseResponse> UpdateCallToVolunteer(int volunteerID, int actionID, CallsToVolunteerDTO volunteerCall);
+        Task<ApiBaseResponse> GetVolunteersNotifications(int volunteerID, bool history);
+        Task<ApiBaseResponse> GetVolunteerStats(GetVolunteerDTO foundVolunteer);
     }
 }

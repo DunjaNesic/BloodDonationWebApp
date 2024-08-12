@@ -87,7 +87,7 @@ namespace BloodDonationApp.DataAccessLayer.VolunteerRepo
             return actions;
         }
 
-        public async Task<IEnumerable<TransfusionAction>> GetIncomingAction(int volunteerID)
+        public async Task<IEnumerable<TransfusionAction>> GetIncomingAction(int volunteerID, bool forNotifications)
         {
             var volunteer = await _context.Volunteers
                .Include(d => d.CallsToVolunteer)
@@ -98,7 +98,14 @@ namespace BloodDonationApp.DataAccessLayer.VolunteerRepo
                 return Enumerable.Empty<TransfusionAction>();
             }
 
-            var calls = volunteer.CallsToVolunteer.Where(ctv => ctv.AcceptedTheCall == true);
+
+            IEnumerable<CallToVolunteer> calls;
+
+            if (forNotifications)
+                calls = volunteer.CallsToVolunteer.Where(ctv => ctv.AcceptedTheCall == false);
+
+            else calls = volunteer.CallsToVolunteer.Where(ctv => ctv.AcceptedTheCall == true);
+
 
             var actionIds = calls.Select(ctv => ctv.ActionID).ToList();
 
@@ -107,13 +114,42 @@ namespace BloodDonationApp.DataAccessLayer.VolunteerRepo
                 return Enumerable.Empty<TransfusionAction>();
             }
 
-            var actions = await _context.TransfusionActions
+            var actions = await _context.TransfusionActions.Include(a => a.Place)
                 .Where(a => actionIds.Contains(a.ActionID) && a.ActionDate > DateTime.UtcNow)
                 .ToListAsync();
 
             return actions;
         }
 
+        public async Task<IEnumerable<TransfusionAction>> GetVolunteersHistory(int volunteerID)
+        {
+            var vol = await _context.Volunteers
+                      .Include(v => v.CallsToVolunteer)
+                      .Include(v => v.RedCross)
+                      .FirstOrDefaultAsync(v => v.VolunteerID == volunteerID);
 
+            if (vol == null || vol.CallsToVolunteer == null || !vol.CallsToVolunteer.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
+
+
+            var calls = vol.CallsToVolunteer.Where(ctv => ctv.ShowedUp == true);
+
+            var actionIds = calls.Select(ctd => ctd.ActionID).ToList();
+
+            if (actionIds == null || !actionIds.Any())
+            {
+                return Enumerable.Empty<TransfusionAction>();
+            }
+
+            var actions = await _context.TransfusionActions
+                .Include(a => a.Place)
+                .Include(a => a.ListOfQuestionnaires)
+                .Where(a => actionIds.Contains(a.ActionID))
+                .ToListAsync();
+
+            return actions;
+        }
     }
 }

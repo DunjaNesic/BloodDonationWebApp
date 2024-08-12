@@ -57,6 +57,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
 
         public async Task<ApiBaseResponse> GetIncomingDonorAction(string jMBG)
         {
+            _logger.LogInformation("GetIncomingDonorAction from DonorService");
             var actions = await uow.DonorRepository.GetIncomingAction(jMBG, false);
 
             if (!actions.Any())
@@ -76,10 +77,19 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             if (action == null) return new ActionNotFoundResponse();
 
             bool accepted = true;
-            await uow.DonorCallsRepository.CreateCall(JMBG, actionID, accepted);
-            await uow.SaveChanges();
-            return new ApiOkResponse<string>("woo");
+
+            try
+            {
+                await uow.DonorCallsRepository.CreateCall(JMBG, actionID, accepted);
+                await uow.SaveChanges();
+                return new ApiOkResponse<string>("woo");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new DonorLegalReasons("Nije bas ok prijavi - odjavi ali ok");
+            }
         }
+
 
         public async Task<ApiBaseResponse> UpdateCallToDonor(string JMBG, int actionID, CallsToDonorDTO donorCall)
         {
@@ -92,11 +102,16 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             var call = await uow.DonorCallsRepository.GetCall(JMBG, actionID, true);
             if (call == null) return new DonorNotFoundResponse();
 
+            if (call.AcceptedTheCall == true && call.ShowedUp == false && donorCall.AcceptedTheCall == true && donorCall.ShowedUp == false)
+            {
+                return new ApiOkResponse<string>("Vec ste prijavljeni na ovu akciju");
+            }
+
             call.AcceptedTheCall = donorCall.AcceptedTheCall;
             call.ShowedUp = donorCall.ShowedUp;
 
             await uow.SaveChanges();
-            return new ApiOkResponse<string>("wooo");
+            return new ApiOkResponse<string>("Uspesno azuriran poziv na akciju");
         }
 
         public async Task<ApiBaseResponse> GetDonorsNotifications(string JMBG, bool history)
@@ -118,18 +133,18 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             return new ApiOkResponse<IEnumerable<GetTransfusionActionDTO>>(actionsDTO);
         }
 
-        public async Task<ApiBaseResponse> GetDonorStats(string JMBG)
+        public async Task<ApiBaseResponse> GetDonorStats(GetDonorDTO donor)
         {
-            var allCalls = await uow.DonorCallsRepository.GetAllCalls(JMBG);
+            var allCalls = await uow.DonorCallsRepository.GetAllCalls(donor.JMBG);
             if (!allCalls.Any())
             {
                 return new DonorNotFoundResponse();
             }
 
-            var acceptedAndAttendedCalls = await uow.DonorCallsRepository.GetAACalls(JMBG);
-            var acceptedButNotAttendedCalls = await uow.DonorCallsRepository.GetADCalls(JMBG);
-            var declinedAndNotAttendedCalls = await uow.DonorCallsRepository.GetDDCalls(JMBG);
-            var declinedButAttendedCalls = await uow.DonorCallsRepository.GetDACalls(JMBG);
+            var acceptedAndAttendedCalls = await uow.DonorCallsRepository.GetAACalls(donor.JMBG);
+            var acceptedButNotAttendedCalls = await uow.DonorCallsRepository.GetADCalls(donor.JMBG);
+            var declinedAndNotAttendedCalls = await uow.DonorCallsRepository.GetDDCalls(donor.JMBG);
+            var declinedButAttendedCalls = await uow.DonorCallsRepository.GetDACalls(donor.JMBG);
 
             int totalActions = allCalls.Count();
             int acceptedAndAttended = acceptedAndAttendedCalls.Count();
@@ -139,7 +154,8 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
 
             DonorStatisticsDTO donorStats = new DonorStatisticsDTO
             {
-                JMBG = JMBG,
+                JMBG = donor.JMBG,
+                FullName = donor.DonorFullName,
                 TotalActions = totalActions,
                 AcceptedAndAttendedPercentage = (double)acceptedAndAttended / totalActions * 100,
                 AcceptedButDidNotAttendPercentage = (double)acceptedButNotAttended / totalActions * 100,

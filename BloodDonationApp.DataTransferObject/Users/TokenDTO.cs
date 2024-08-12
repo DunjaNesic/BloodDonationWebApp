@@ -8,6 +8,7 @@ namespace BloodDonationApp.DataTransferObject.Users
 {
     public class TokenDTO
     {
+        public int UserID { get; set; }
         public string? AccessToken { get; set; }
         public string? RefreshToken { get; set; }
     }

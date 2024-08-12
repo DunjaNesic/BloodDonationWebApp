@@ -29,7 +29,7 @@ namespace BloodDonationApp.Domain.DomainModel
         public Sex Sex { get; set; }
         public BloodType BloodType { get; set; }
         public bool IsActive { get; set; }
-        public DateTime LastDonationDate { get; set; }
+        public DateTime? LastDonationDate { get; set; }
         public int PlaceID { get; set; }
         public Place Place { get; set; } = null!;
 

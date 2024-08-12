@@ -23,11 +23,11 @@ namespace BloodDonationApp.Domain.DomainModel
         public Place Place { get; set; } = null!;
         public int OfficialID { get; set; }
         public Official ActionCoordinator { get; set; } = null!;
-        public List<Volunteer>? ListOfVolunteers { get; set; }
-        public List<CallToVolunteer>? ListOfCallsToVolunteers { get; set; }
-        public List<Donor>? ListOfDonors { get; set; }
-        public List<CallToDonate>? ListOfCallsToDonors { get; set; }
-        public List<Questionnaire>? ListOfQuestionnaires { get; set; }
+        public List<Volunteer>? ListOfVolunteers { get; set; } = new List<Volunteer>();
+        public List<CallToVolunteer> ListOfCallsToVolunteers { get; set; } = new List<CallToVolunteer>();
+        public List<Donor>? ListOfDonors { get; set; } = new List<Donor>();
+        public List<CallToDonate> ListOfCallsToDonors { get; set; } = new List<CallToDonate>();
+        public List<Questionnaire>? ListOfQuestionnaires { get; set; } = new List<Questionnaire>();
         public List<Official>? ListOfActionOfficials { get; set; }
         public byte[] RowVersion { get; set; } = Array.Empty<byte>();
         public override string ToString()

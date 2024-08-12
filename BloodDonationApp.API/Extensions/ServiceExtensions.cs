@@ -77,7 +77,7 @@ namespace BloodDonationApp.API.Extensions
                 partition => new FixedWindowRateLimiterOptions
                 {
                     AutoReplenishment = true,
-                    PermitLimit = 13,
+                    PermitLimit = 42,
                     QueueLimit = 1,
                     QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                     Window = TimeSpan.FromMinutes(1)
@@ -88,7 +88,7 @@ namespace BloodDonationApp.API.Extensions
                 partition => new FixedWindowRateLimiterOptions
                 {
                     AutoReplenishment = true,
-                    PermitLimit = 7,
+                    PermitLimit = 42,
                     Window = TimeSpan.FromSeconds(13)
                 }));
 

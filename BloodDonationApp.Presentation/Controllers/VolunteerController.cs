@@ -12,6 +12,7 @@ using BloodDonationApp.Presentation.ActionFilters;
 using Common.RequestFeatures;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Volunteer;
 using BloodDonationApp.DataTransferObject.Donors;
+using BloodDonationApp.DataTransferObject.Action;
 
 namespace BloodDonationApp.Presentation
 {
@@ -69,6 +70,34 @@ namespace BloodDonationApp.Presentation
             var call = baseResult.GetResult<string>();
 
             return Ok(call);
+        }
+
+        [HttpGet("{volunteerID}/calls/{history}")]
+        public async Task<ActionResult<GetTransfusionActionDTO>> GetVolunteersNotifications(int volunteerID, bool history)
+        {
+            var baseResult = await _serviceManager.VolunteerService.GetVolunteer(volunteerID);
+            if (!baseResult.Success) return ProcessError(baseResult);
+
+            var notifsBaseRes = await _serviceManager.VolunteerService.GetVolunteersNotifications(volunteerID, history);
+            if (!notifsBaseRes.Success) return ProcessError(notifsBaseRes);
+
+            return Ok(notifsBaseRes.GetResult<IEnumerable<GetTransfusionActionDTO>>());
+        }
+
+        [HttpGet("{volunteerID}/stats")]
+        public async Task<ActionResult<DonorStatisticsDTO>> GetVolunteerStatistics(int volunteerID)
+        {
+            var baseResult = await _serviceManager.VolunteerService.GetVolunteer(volunteerID);
+            if (!baseResult.Success) return ProcessError(baseResult);
+
+            var foundVolunteer = baseResult.GetResult<GetVolunteerDTO>();
+
+            var baseResultStats = await _serviceManager.VolunteerService.GetVolunteerStats(foundVolunteer);
+            if (!baseResultStats.Success) return ProcessError(baseResultStats);
+
+            var stats = baseResultStats.GetResult<VolunteerStatisticsDTO>();
+
+            return Ok(stats);
         }
 
     }

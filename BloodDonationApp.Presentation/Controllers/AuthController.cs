@@ -26,15 +26,28 @@ namespace BloodDonationApp.Presentation.Controllers
             _serviceManager = serviceManager;
         }
 
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserType(int userId)
+        {
+            var userType = await _serviceManager.AuthenticationService.GetUserTypeAsync(userId);
+            if (userType == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(userType);
+        }
+
         [HttpPost("/login")]
         public async Task<IActionResult> Login([FromBody] UserLoginDTO user)
         {
             if (user == null) return BadRequest("Invalid client request");
 
-            if (!await _serviceManager.AuthenticationService.ValidateUser(user))
+            int userID = await _serviceManager.AuthenticationService.ValidateUser(user);
+            if (userID == 0)
                 return Unauthorized();
 
-            var tokenDTO = await _serviceManager.AuthenticationService.CreateToken(true);
+            var tokenDTO = await _serviceManager.AuthenticationService.CreateToken(true, userID);
 
             return Ok(tokenDTO);
         }

@@ -3,13 +3,16 @@ using BloodDonationApp.DataAccessLayer.BaseRepository;
 using BloodDonationApp.DataAccessLayer.UnitOfWork;
 using BloodDonationApp.DataTransferObject.Users;
 using BloodDonationApp.Domain.DomainModel;
+using BloodDonationApp.Domain.DTOs;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
 using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Donor;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -54,7 +57,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             }
 
             await _uow.UserRepository.CreateUser(user);
-            await _uow.SaveChanges(); 
+            await _uow.SaveChanges();
 
             var donor = new Donor
             {
@@ -63,9 +66,9 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
                 Sex = registrationDTO.Sex,
                 BloodType = registrationDTO.BloodType,
                 IsActive = registrationDTO.IsActive,
-                LastDonationDate = registrationDTO.LastDonationDate,
                 PlaceID = registrationDTO.PlaceID,
-                UserID = user.UserID 
+                UserID = user.UserID,
+                LastDonationDate = DateTime.UtcNow               
             };
 
             await _uow.DonorRepository.CreateDonor(donor);
@@ -74,17 +77,21 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             return new ApiOkResponse<string>("Registration successful");
         }
 
-        public async Task<bool> ValidateUser(UserLoginDTO userForLogin)
+        public async Task<int> ValidateUser(UserLoginDTO userForLogin)
         {
             user = await _uow.UserRepository.FindByEmailAsync(userForLogin.Email);
 
             var result = (user != null && await _uow.UserRepository.CheckPasswordAsync(user, userForLogin.Password));
             if (!result)
-                _logger.LogWarning($"{nameof(ValidateUser)}: Authentication failed. Wrong user credentials"); 
-            return result;
+            {
+                _logger.LogWarning($"{nameof(ValidateUser)}: Authentication failed. Wrong user credentials");
+                return 0;            
+            }
+            _logger.LogInformation($"{nameof(ValidateUser)}: Doing auth");
+            return user?.UserID ?? 0;
         }
 
-        public async Task<TokenDTO> CreateToken(bool includeExpiry)
+        public async Task<TokenDTO> CreateToken(bool includeExpiry, int userID)
         {
             var signingCredentials = GetSigningCredentials();
             var claims = await GetClaims();
@@ -103,6 +110,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
             TokenDTO token = new TokenDTO() {
+            UserID = userID,
             AccessToken = accessToken,
             RefreshToken = refreshToken
             };
@@ -202,12 +210,38 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
                 throw new Exception("promenicu ovo posle");
             
             user = targetUser;
-            return await CreateToken(false);
+            return await CreateToken(false, user?.UserID ?? 0);
         }
 
         public Task RevokeToken()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<UserTypeDTO?> GetUserTypeAsync(int userId)
+        {
+            Expression<Func<Donor, bool>> donorCondition = donor => donor.UserID == userId;
+            var donor = await _uow.DonorRepository.GetDonorsByCondition(donorCondition, false).FirstOrDefaultAsync();
+            if (donor != null)
+            {
+                return new UserTypeDTO
+                {
+                    UserType = "Donor",
+                    JMBG = donor.JMBG
+                };
+            }
+            Expression<Func<Volunteer, bool>> volunteerCondition = vol => vol.UserID == userId;
+            var volunteer = await _uow.VolunteerRepository.GetVolunteersByCondition(volunteerCondition, false).FirstOrDefaultAsync();
+            if (volunteer != null)
+            {
+                return new UserTypeDTO
+                {
+                    UserType = "Volunteer",
+                    VolunteerID = volunteer.VolunteerID
+                };
+            }
+
+            return null;
         }
     }
  }

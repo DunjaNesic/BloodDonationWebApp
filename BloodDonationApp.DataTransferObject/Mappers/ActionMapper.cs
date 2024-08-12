@@ -23,6 +23,26 @@ namespace BloodDonationApp.DataTransferObject.Mappers
         public TransfusionAction FromDto(GetTransfusionActionDTO action)
         {
             throw new NotImplementedException();
-        }      
+        }
+
+        public TransfusionAction FromDto(CreateTransfusionActionDTO action)
+        {
+            return new TransfusionAction() {
+                ActionName = action.ActionName,
+                ActionDate = action.ActionDate,
+                ActionTimeFromTo = action.ActionTimeFromTo,
+                ExactLocation = action.ExactLocation,
+                PlaceID = action.PlaceID,
+                OfficialID = action.OfficialID,
+            };
+        }
+
+        public CreateTransfusionActionDTO ToDtoCreate(TransfusionAction action) => new()
+        {
+            ActionName = action.ActionName,
+            ActionDate = action.ActionDate,
+            ActionTimeFromTo = action.ActionTimeFromTo ,
+            ExactLocation = action.ExactLocation
+        };
     }
 }
