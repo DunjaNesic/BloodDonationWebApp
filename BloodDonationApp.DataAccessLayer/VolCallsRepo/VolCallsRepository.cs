@@ -84,5 +84,43 @@ namespace BloodDonationApp.DataAccessLayer.VolCallsRepo
             var calls = volunteer.CallsToVolunteer.Where(ctv => ctv.AcceptedTheCall == accepted && ctv.ShowedUp == showedUp);
             return calls;
         }
+
+        public async Task<object?> CreateCalls(int[]? volunteerIDs, int actionID)
+        {
+            var action = await _context.TransfusionActions.FindAsync(actionID);
+            if (action == null)
+            {
+                return null;
+            }
+
+            foreach (var id in volunteerIDs)
+            {
+                var volunteer = await _context.Volunteers.FindAsync(id);
+                if (volunteer == null)
+                {
+                    return null;
+                }
+
+                var existingCall = await GetCall(id, actionID, false);
+
+                if (existingCall == null)
+                {
+                    var newCall = new CallToVolunteer
+                    {
+                        VolunteerID = id,
+                        ActionID = actionID,
+                        AcceptedTheCall = false,
+                        ShowedUp = false
+                    };
+
+                    _context.CallsToVolunteer.Add(newCall);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
     }
 }

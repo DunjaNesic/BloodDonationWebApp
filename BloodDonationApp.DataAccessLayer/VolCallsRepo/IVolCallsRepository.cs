@@ -17,5 +17,6 @@ namespace BloodDonationApp.DataAccessLayer.VolCallsRepo
         Task<IEnumerable<CallToVolunteer?>> GetADCalls(int volunteerID);
         Task<IEnumerable<CallToVolunteer?>> GetDDCalls(int volunteerID);
         Task<IEnumerable<CallToVolunteer?>> GetDACalls(int volunteerID);
+        Task<object?> CreateCalls(int[]? volunteerIDs, int actionID);
     }
 }

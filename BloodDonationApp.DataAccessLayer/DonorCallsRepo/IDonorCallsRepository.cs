@@ -9,10 +9,12 @@ namespace BloodDonationApp.DataAccessLayer.DonorCallsRepo
     {
         Task CreateCall(string JMBG, int actionID, bool accepted);
         Task<CallToDonate?> GetCall(string JMBG, int actionID, bool trackChanges);
+        Task<object?> CreateCalls(string[] jMBGs, int actionID);
         Task<IEnumerable<CallToDonate?>> GetAllCalls(string JMBG);
         Task<IEnumerable<CallToDonate?>> GetAACalls(string JMBG);
         Task<IEnumerable<CallToDonate?>> GetADCalls(string JMBG);
         Task<IEnumerable<CallToDonate?>> GetDDCalls(string JMBG);
         Task<IEnumerable<CallToDonate?>> GetDACalls(string JMBG);
+        Task<IEnumerable<Donor?>> GetShowedUpDonors(int actionID);
     }
 }

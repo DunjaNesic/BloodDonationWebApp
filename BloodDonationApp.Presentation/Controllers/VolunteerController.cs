@@ -100,5 +100,16 @@ namespace BloodDonationApp.Presentation
             return Ok(stats);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ActionCall([FromBody] CreateVolunteerCallsDTO calls)
+        {
+            var baseResult = await _serviceManager.VolunteerService.CallVolunteers(calls.VolunteerIDs, calls.ActionID);
+            if (!baseResult.Success) return ProcessError(baseResult);
+
+            var call = baseResult.GetResult<object>();
+
+            return Ok(call);
+        }
+
     }
 }

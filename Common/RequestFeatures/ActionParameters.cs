@@ -10,6 +10,7 @@ namespace Common.RequestFeatures
     {
         public DateTime? MinDate { get; set; } = DateTime.UtcNow.Date;
         public DateTime? MaxDate { get; set; } = DateTime.MaxValue;
+        public int PlaceID { get; set; }
         public string? Search { get; set; }
     }
 }

@@ -54,6 +54,17 @@ namespace BloodDonationApp.Presentation.Controllers
             return Ok(call);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ActionCall([FromBody] CreateDonorCallsDTO calls)
+        {
+            var baseResult = await _serviceManager.DonorService.CallDonors(calls.JMBGs, calls.ActionID);
+            if (!baseResult.Success) return ProcessError(baseResult);
+
+            var call = baseResult.GetResult<object>();
+
+            return Ok(call);
+        }
+
         [HttpPut]
         [Route("{JMBG}/{actionID}")]
         public async Task<IActionResult> UpdateCall([FromRoute] string JMBG, int actionID, [FromBody] CallsToDonorDTO donorCall)
@@ -76,6 +87,15 @@ namespace BloodDonationApp.Presentation.Controllers
             if (!notifsBaseRes.Success) return ProcessError(notifsBaseRes);
 
             return Ok(notifsBaseRes.GetResult<IEnumerable<GetTransfusionActionDTO>>());
+        }
+
+        [HttpGet("present")]
+        public async Task<ActionResult<GetDonorDTO>> GetPresentDonors(int actionID)
+        {
+            var baseResult = await _serviceManager.DonorService.GetAllPresentDonors(actionID);
+            if (!baseResult.Success) return ProcessError(baseResult);
+
+            return Ok(baseResult.GetResult<IEnumerable<GetDonorQuestionnaireDTO>>());
         }
 
         [HttpGet("{JMBG}/stats")]

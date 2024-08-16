@@ -8,10 +8,10 @@ namespace Common.RequestFeatures
 {
     public abstract class RequestParameters
     {
-        const int maxPageSize = 42;
+        const int maxPageSize = 4213;
         public int PageNumber { get; set; } = 1;
 
-        private int _pageSize = 9;
+        private int _pageSize = 1337;
         public int PageSize
         {
             get { return _pageSize; }

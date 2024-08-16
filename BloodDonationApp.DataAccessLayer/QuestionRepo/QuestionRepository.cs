@@ -23,5 +23,10 @@ namespace BloodDonationApp.DataAccessLayer.QuestionRepo
         {
             return await GetByCondition(condition, trackChanges).ToListAsync();
         }
+
+        public async Task<IEnumerable<Question>> GetAllQuestions(bool trackChanges)
+        {
+            return await GetAll(trackChanges).ToListAsync();
+        }
     }
 }

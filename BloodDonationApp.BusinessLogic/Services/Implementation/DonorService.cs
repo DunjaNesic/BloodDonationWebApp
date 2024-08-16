@@ -11,6 +11,7 @@ using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
 using Common.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
 
 namespace BloodDonationApp.BusinessLogic.Services.Implementation
 {
@@ -18,7 +19,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
     {
         private readonly IUnitOfWork uow;
         private readonly ILoggerManager _logger;
-        private readonly DonorMapper _mapper = new DonorMapper();
+        private readonly DonorMapper _mapper = new DonorMapper(new QuestionnaireMapper());
         private readonly ActionMapper _actionMapper = new ActionMapper();
         private readonly CallToDonateMapper _callsMapper = new CallToDonateMapper();
         public DonorService(IUnitOfWork unitOfWork, ILoggerManager logger)
@@ -89,7 +90,6 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
                 return new DonorLegalReasons("Nije bas ok prijavi - odjavi ali ok");
             }
         }
-
 
         public async Task<ApiBaseResponse> UpdateCallToDonor(string JMBG, int actionID, CallsToDonorDTO donorCall)
         {
@@ -165,5 +165,56 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
 
             return new ApiOkResponse<DonorStatisticsDTO>(donorStats);
         }
+
+        public async Task<ApiBaseResponse> GetCalledDonors(int actionID, bool trackChanges)
+        {
+            var calledDonors = await uow.DonorRepository.GetCalledDonorsAsync(actionID, trackChanges);
+
+            if (calledDonors == null || !calledDonors.Any())
+            {
+                return new DonorNotFoundResponse();
+            }
+
+            var calledDonorsDTO = calledDonors.Select(d => _mapper.ToDto(d)).ToList();
+
+            return new ApiOkResponse<IEnumerable<GetDonorDTO>>(calledDonorsDTO);
+        }
+
+        public async Task<ApiBaseResponse> CallDonors(string[] jMBGs, int actionID)
+        {
+            var res = await uow.DonorCallsRepository.CreateCalls(jMBGs, actionID);
+            if (res == null) return new DonorNotFoundResponse();
+            else return new ApiOkResponse<object>(res);
+        }
+
+        public async Task<ApiBaseResponse> DonorShowedUp(string JMBG, int actionID)
+        {
+            var call = await uow.DonorCallsRepository.GetCall(JMBG, actionID, true);
+            if (call == null) return new DonorNotFoundResponse();
+            
+            call.ShowedUp = true;
+            await uow.SaveChanges();
+            return new ApiOkResponse<string>("Uspesno azuriran poziv na akciju");
+        }
+
+        public async Task<ApiBaseResponse> GetAllPresentDonors(int actionID)
+        {
+            var presentDonors = await uow.DonorCallsRepository.GetShowedUpDonors(actionID);
+            if (!presentDonors.Any()) return new DonorNotFoundResponse();
+
+            var presentDonorDTOs = new List<GetDonorQuestionnaireDTO>();
+
+            foreach (var donor in presentDonors)
+            {
+                var questionnaire = donor?.ListOfQuestionnaires.FirstOrDefault(q => q.ActionID == actionID && q.Approved == false);
+
+                if (questionnaire == null) continue;
+                var donorDTO = _mapper.ToDto2(donor, questionnaire);
+                presentDonorDTOs.Add(donorDTO);
+            }
+
+            return new ApiOkResponse<IEnumerable<GetDonorQuestionnaireDTO>>(presentDonorDTOs);
+        }
+
     }
 }

@@ -27,7 +27,7 @@ namespace BloodDonationApp.DataAccessLayer.ActionRepo
             };
 
             var query = GetAll(trackChanges, includes)
-                .Filter(actionParameters.MinDate, actionParameters.MaxDate)
+                .Filter(actionParameters.MinDate, actionParameters.MaxDate, actionParameters.PlaceID)
                 .Search(actionParameters.Search)
                 .OrderBy(a => a.Place)
                 .Skip((actionParameters.PageNumber - 1)*actionParameters.PageSize)

@@ -164,5 +164,16 @@ namespace BloodDonationApp.DataAccessLayer.DonorRepo
         {        
             await CreateAsync(donor);
         }
+
+        public async Task<IEnumerable<Donor>> GetCalledDonorsAsync(int actionID, bool trackChanges)
+        {
+            var calledDonors = GetDonorsByCondition(
+                d => d.CallsToDonate.Any(ctd => ctd.ActionID == actionID),
+                trackChanges
+            );
+
+            return await calledDonors.ToListAsync();
+        }
+
     }
 }

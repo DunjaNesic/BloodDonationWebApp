@@ -18,5 +18,6 @@ namespace BloodDonationApp.DataAccessLayer.VolunteerRepo
         Task<IEnumerable<TransfusionAction>> GetActions(int volunteerID);
         Task<IEnumerable<TransfusionAction>> GetIncomingAction(int volunteerID, bool forNotifications);
         Task<IEnumerable<TransfusionAction>> GetVolunteersHistory(int volunteerID);
+        Task<IEnumerable<Volunteer>> GetCalledVolunteersAsync(int actionID, bool v);
     }
 }

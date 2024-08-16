@@ -151,5 +151,15 @@ namespace BloodDonationApp.DataAccessLayer.VolunteerRepo
 
             return actions;
         }
+
+        public async Task<IEnumerable<Volunteer>> GetCalledVolunteersAsync(int actionID, bool v)
+        {
+            var calledVolunteers = GetVolunteersByCondition(
+                            v => v.CallsToVolunteer.Any(ctv => ctv.ActionID == actionID),
+                            v
+                        );
+
+            return await calledVolunteers.ToListAsync();
+        }
     }
 }

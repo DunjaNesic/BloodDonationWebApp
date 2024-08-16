@@ -176,5 +176,26 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
 
             return new ApiOkResponse<VolunteerStatisticsDTO>(volunteerStats);
         }
+
+        public async Task<ApiBaseResponse> GetCalledVolunteers(int actionID, bool v)
+        {
+            var calledVolunteers = await uow.VolunteerRepository.GetCalledVolunteersAsync(actionID, v);
+
+            if (calledVolunteers == null || !calledVolunteers.Any())
+            {
+                return new DonorNotFoundResponse();
+            }
+
+            var calledVolunteersDTO = calledVolunteers.Select(v => _mapper.ToDto(v)).ToList();
+
+            return new ApiOkResponse<IEnumerable<GetVolunteerDTO>>(calledVolunteersDTO);
+        }
+
+        public async Task<ApiBaseResponse> CallVolunteers(int[]? volunteerIDs, int actionID)
+        {
+            var res = await uow.VolunteerCallsRepository.CreateCalls(volunteerIDs, actionID);
+            if (res == null) return new VolunteerNotFoundResponse();
+            else return new ApiOkResponse<object>(res);
+        }
     }
 }

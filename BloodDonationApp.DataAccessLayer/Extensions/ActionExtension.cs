@@ -10,8 +10,12 @@ namespace BloodDonationApp.DataAccessLayer.Extensions
 {
     public static class ActionExtension
     {
-        public static IQueryable<TransfusionAction> Filter(this IQueryable<TransfusionAction> actions, DateTime? minDate, DateTime? maxDate) =>
-            actions.Where(a => (a.ActionDate >= minDate && a.ActionDate <= maxDate));
+        public static IQueryable<TransfusionAction> Filter(this IQueryable<TransfusionAction> actions, DateTime? minDate, DateTime? maxDate, int placeID)
+        {
+            actions = actions.Where(a => (a.ActionDate >= minDate && a.ActionDate <= maxDate));
+            if (placeID != 0) actions = actions.Where(d => d.Place.PlaceID == placeID);
+            return actions;
+        }
 
         public static IQueryable<TransfusionAction> Search(this IQueryable<TransfusionAction> actions, string search)
         {

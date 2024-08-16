@@ -10,6 +10,8 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
 {
     public interface IQuestionService
     {
-        Task<ApiBaseResponse> GetAll(bool trackChanges);
+        Task<ApiBaseResponse> GetQuestionsForDonor(bool trackChanges);
+        Task<ApiBaseResponse> GetAllQuestions(bool trackChanges);
+
     }
 }

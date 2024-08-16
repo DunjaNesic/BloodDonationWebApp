@@ -9,6 +9,7 @@ namespace BloodDonationApp.DataAccessLayer.QuestionRepo
     public interface IQuestionRepository : IRepository<Question>
     {
         Task<IEnumerable<Question>> GetQuestionsByConditionAsync(Expression<Func<Question, bool>> condition, bool trackChanges);
+        Task<IEnumerable<Question>> GetAllQuestions(bool trackChanges);
 
     }
 }

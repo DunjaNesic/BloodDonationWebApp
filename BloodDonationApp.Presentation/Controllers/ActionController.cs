@@ -7,6 +7,7 @@ using BloodDonationApp.Domain.CustomModel;
 using BloodDonationApp.Domain.DomainModel;
 using BloodDonationApp.Domain.LinkModel;
 using BloodDonationApp.Domain.ResponsesModel.BaseApiResponse;
+using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.Presentation.ActionFilters;
 using Common.RequestFeatures;
 using Microsoft.AspNetCore.Authorization;
@@ -196,6 +197,28 @@ namespace BloodDonationApp.Presentation.Controllers
                 return ProcessError(result);
 
             return Ok(result.GetResult<GetActionDetailsDTO>());
+        }
+
+        [HttpGet("called-donors")]
+        public async Task<IActionResult> GetCalledDonors(int actionID)
+        {
+            var result = await _serviceManager.DonorService.GetCalledDonors(actionID, false);
+
+            if (!result.Success)
+                return ProcessError(result);
+
+            return Ok(result.GetResult<IEnumerable<GetDonorDTO>>());
+        }
+
+        [HttpGet("called-volunteers")]
+        public async Task<IActionResult> GetCalledVolunteers(int actionID)
+        {
+            var result = await _serviceManager.VolunteerService.GetCalledVolunteers(actionID, false);
+
+            if (!result.Success)
+                return ProcessError(result);
+
+            return Ok(result.GetResult<IEnumerable<GetVolunteerDTO>>());
         }
 
 

@@ -10,6 +10,10 @@ using BloodDonationApp.Domain.ResponsesModel.ConcreteResponses.Questionnaire;
 using BloodDonationApp.Domain.ResponsesModel.Responses;
 using BloodDonationApp.LoggerService;
 using Common.RequestFeatures;
+using iText.IO.Image;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
 using QRCoder;
 using System.Drawing.Imaging;
 using System.Linq.Expressions;
@@ -65,6 +69,12 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             var questionnaire = _mapper.FromDto(questionnaireDTO, questions);
 
             await uow.QuestionnaireRepository.CreateQuestionnaireForDonor(JMBG, actionID, questionnaire);
+
+            var call = await uow.DonorCallsRepository.GetCall(JMBG, actionID, true);
+            if (call == null) return new DonorNotFoundResponse();
+
+            call.ShowedUp = true;
+
             await uow.SaveChanges();
 
             var questionnaireToReturn = _mapper.ToDto(questionnaire);
@@ -79,7 +89,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             if (action == null) return new ActionNotFoundResponse();
 
             Expression<Func<Question, bool>> condition = question => question.Flag == 1;
-            var questions = await uow.QuestionRepository.GetQuestionsByConditionAsync(condition, true);
+            var questions = await uow.QuestionRepository.GetAllQuestions(false);
 
             var questionnaire = await uow.QuestionnaireRepository.GetQuestionnaire(JMBG, actionID, true);
             if (questionnaire == null) return new QuestionnareNotFoundResponse();
@@ -88,9 +98,7 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             questionnaire.Remark = changedQuestionnaire.Remark;
             questionnaire.Approved = changedQuestionnaire.Approved;
             questionnaire.RowVersion = changedQuestionnaire.RowVersion;
-            questionnaire.ListOfQuestions = questionnaire.ListOfQuestions
-                                        .Concat(changedQuestionnaire.ListOfQuestions)
-                                        .ToList();
+            questionnaire.ListOfQuestions = changedQuestionnaire.ListOfQuestions.ToList();
             if (questionnaire.RowVersion.SequenceEqual(changedQuestionnaire.RowVersion) == false)
             {
                 throw new Exception("Radite sa zastarelim podacima o upitniku");
@@ -112,14 +120,42 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
                     Directory.CreateDirectory(directoryPath);
                 }
 
-                string filePath = Path.Combine(directoryPath, $"{JMBG}_{actionID}.png");
+                string imageFilePath = Path.Combine(directoryPath, $"{JMBG}_{actionID}.png");
 #pragma warning disable CA1416 // Validate platform compatibility
-                qrCodeAsBitmap.Save(filePath, ImageFormat.Png);
+                qrCodeAsBitmap.Save(imageFilePath, ImageFormat.Png);
 #pragma warning restore CA1416 // Validate platform compatibility
-                //npr https://localhost:7062/qrcodes/0101995700001_3.png
-            }
 
-            await uow.SaveChanges();
+                //npr https://localhost:7062/qrcodes/0101995700001_3.png
+
+                string pdfFilePath = Path.Combine(directoryPath, $"{JMBG}_{actionID}.pdf");
+
+                using (PdfWriter writer = new PdfWriter(pdfFilePath))
+                {
+                    using (PdfDocument pdf = new PdfDocument(writer))
+                    {
+                        Document document = new Document(pdf);
+               
+                        using (var stream = new MemoryStream())
+                        {
+#pragma warning disable CA1416 // Validate platform compatibility
+                            qrCodeAsBitmap.Save(stream, ImageFormat.Png);
+#pragma warning restore CA1416 // Validate platform compatibility
+                            ImageData imageData = ImageDataFactory.Create(stream.ToArray());
+
+                            iText.Layout.Element.Image pdfImage = new iText.Layout.Element.Image(imageData);
+
+                            document.Add(pdfImage);
+                        }
+
+                        document.Close();
+                    }
+                }
+                // The PDF is saved at 'pdfFilePath'
+                // The PDF can now be downloaded from the URL: https://localhost:7062/qrcodes/0101995700001_3.pdf
+                      
+        }
+
+        await uow.SaveChanges();
 
             var questionnaireToReturn = _mapper.ToDto(questionnaire);
 

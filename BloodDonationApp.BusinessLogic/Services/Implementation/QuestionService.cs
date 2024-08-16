@@ -20,7 +20,13 @@ namespace BloodDonationApp.BusinessLogic.Services.Implementation
             uow = unitOfWork;
         }
 
-        public async Task<ApiBaseResponse> GetAll(bool trackChanges)
+        public async Task<ApiBaseResponse> GetAllQuestions(bool trackChanges)
+        {
+            var questions = await uow.QuestionRepository.GetAllQuestions(false);
+            return new ApiOkResponse<IEnumerable<Question>>(questions);
+        }
+
+        public async Task<ApiBaseResponse> GetQuestionsForDonor(bool trackChanges)
         {
             Expression<Func<Question, bool>> condition = question => question.Flag == 0;
             var questions = await uow.QuestionRepository.GetQuestionsByConditionAsync(condition, false);

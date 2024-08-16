@@ -14,7 +14,9 @@ namespace BloodDonationApp.DataAccessLayer.Extensions
     {
         public static IQueryable<Donor> Filter(this IQueryable<Donor> donors, DateTime nextDonationDate, bool? isActive, BloodType? bloodType, Sex? sex, int placeID)
         {
-            donors = donors.Where(d => (d.LastDonationDate <= nextDonationDate.AddMonths(-4)));
+            donors = donors.Where(d =>
+                (d.LastDonationDate == null || d.LastDonationDate <= nextDonationDate.AddMonths(-4))
+            );
 
             if (isActive.HasValue) donors = donors.Where(d => d.IsActive == isActive.Value);
             if (bloodType.HasValue) donors = donors.Where(d => d.BloodType == bloodType);

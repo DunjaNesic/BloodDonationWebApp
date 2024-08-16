@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Hosting;
 using BloodDonationApp.Presentation;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,7 +47,7 @@ builder.Services.ConfigureUnitOfWork();
 builder.Services.ConfigureServiceManager();
 //builder.Services.ConfigureResponseCaching();
 //builder.Services.ConfigureOutputCaching();
-builder.Services.ConfigureRateLimitingOptions();
+//builder.Services.ConfigureRateLimitingOptions();
 builder.Services.AddAuthentication();
 builder.Services.ConfigureJWT(builder.Configuration);
 
@@ -66,6 +67,12 @@ builder.Services.AddControllers(config =>
     .AddNewtonsoftJson()   
     //.AddXmlDataContractSerializerFormatters()
     .AddApplicationPart(typeof(BloodDonationApp.Presentation.AssemblyReference).Assembly);
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddCustomMediaTypes();
 
@@ -91,7 +98,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -99,7 +106,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.All
 });
 
-app.UseRateLimiter();
+//app.UseRateLimiter();
 app.UseCors("CorsPolicy");
 //app.UseResponseCaching();
 //app.UseOutputCache();

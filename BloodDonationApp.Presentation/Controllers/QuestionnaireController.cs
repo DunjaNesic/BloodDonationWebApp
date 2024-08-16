@@ -44,7 +44,20 @@ namespace BloodDonationApp.Presentation.Controllers
         [HttpGet("questions")]
         public async Task<ActionResult<IEnumerable<Question>>> GetAllQuestions(string JMBG)
         {
-            var baseResult = await _serviceManager.QuestionService.GetAll(false);
+            var baseResult = await _serviceManager.QuestionService.GetQuestionsForDonor(false);
+
+            if (!baseResult.Success)
+                return ProcessError(baseResult);
+
+            var questions = baseResult.GetResult<IEnumerable<Question>>();
+
+            return Ok(questions);
+        }
+
+        [HttpGet("/itk/questions")]
+        public async Task<ActionResult<IEnumerable<Question>>> GetAlll()
+        {
+            var baseResult = await _serviceManager.QuestionService.GetAllQuestions(false);
 
             if (!baseResult.Success)
                 return ProcessError(baseResult);
@@ -69,7 +82,7 @@ namespace BloodDonationApp.Presentation.Controllers
 
         [HttpPost("{actionID}")]
         //[ServiceFilter(typeof(ValidationFilterAttribute))]
-        public async Task<ActionResult<GetQuestionnaireDTO>> Create(string JMBG, int actionID, [FromBody] CreateQuestionnaireDTO createdQuestionnaire)
+        public async Task<IActionResult> Create(string JMBG, int actionID, [FromBody] CreateQuestionnaireDTO createdQuestionnaire)
         {
              var baseResult = await _serviceManager.QuestionnaireService.Create(JMBG, actionID, createdQuestionnaire);
              

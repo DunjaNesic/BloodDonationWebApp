@@ -27,6 +27,8 @@ namespace BloodDonationApp.Domain.DomainModel
         public int UserID { get; set; }
         public User User { get; set; }
         public Sex Sex { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public BloodType BloodType { get; set; }
         public bool IsActive { get; set; }
         public DateTime? LastDonationDate { get; set; }

@@ -9,9 +9,10 @@ namespace BloodDonationApp.DataTransferObject.Questionnaires
 {
     [Serializable]
     public class GetQuestionnaireDTO
-    {
+    {     
         public string? QuestionnaireTitle { get; set; }
         public string? Remark { get; set; }
+        public bool Approved { get; set; }
         public List<QuestionnaireQuestionDTO>? AnsweredQuestions { get; set; }
 
     }

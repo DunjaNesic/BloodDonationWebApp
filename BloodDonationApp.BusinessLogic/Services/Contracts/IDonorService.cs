@@ -22,5 +22,9 @@ namespace BloodDonationApp.BusinessLogic.Services.Contracts
         Task<ApiBaseResponse> UpdateCallToDonor(string JMBG, int actionID, CallsToDonorDTO donorCall);
         Task<ApiBaseResponse> GetDonorsNotifications(string JMBG, bool history);
         Task<ApiBaseResponse> GetDonorStats(GetDonorDTO donor);
+        Task<ApiBaseResponse> GetCalledDonors(int actionID, bool trackChanges);
+        Task<ApiBaseResponse> CallDonors(string[] jMBGs, int actionID);
+        Task<ApiBaseResponse> DonorShowedUp(string JMBG, int actionID);
+        Task<ApiBaseResponse> GetAllPresentDonors(int actionID);
     }
 }

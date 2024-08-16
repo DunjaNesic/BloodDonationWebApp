@@ -16,22 +16,13 @@ namespace BloodDonationApp.DataTransferObject.Mappers
             QuestionID = question.QuestionID,
             Answer = question.Answer
         };
-        public GetQuestionnaireDTO ToDto(Questionnaire? questionnaire)
-        {
-            if (questionnaire == null)
-            {
-                return new GetQuestionnaireDTO
-                {
-                    QuestionnaireTitle = string.Empty,
-                    Remark = string.Empty,
-                    AnsweredQuestions = new List<QuestionnaireQuestionDTO>()
-                };
-            }
-
+        public GetQuestionnaireDTO ToDto(Questionnaire questionnaire)
+        {    
             return new GetQuestionnaireDTO
             {
                 QuestionnaireTitle = questionnaire.QuestionnaireTitle,
                 Remark = questionnaire.Remark,
+                Approved = questionnaire.Approved,
                 AnsweredQuestions = questionnaire.ListOfQuestions?.Select(q => this.ToDto(q)).ToList() ?? new List<QuestionnaireQuestionDTO>()
             };
         }
